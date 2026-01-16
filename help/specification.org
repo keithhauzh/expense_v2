@@ -1,6 +1,8 @@
 #+title: Expense V2 Project Specification
 #+description: this is going to be some requirements i want to note down for my personal project coming up, note to self: implement requirements in order
 
+TODO: Update specification (making wireframe made me realise i need to make a few changes)
+
 * Important concepts to remember for this project
 ** Denormalization
 - delegate calculations or accumulations to write events, for example, totalExpenses should be a field in a group, so that we don't need to find the sum of each expense per account everytime we read a group's expenses
@@ -15,6 +17,7 @@
 - MVP
   + id
   + username
+  + password
 - Additional Features
   + date created
 ** Expenses
@@ -114,3 +117,9 @@
 - change group joining to be decided by account instead of owner, owner can invite, account can accept or decline
 ** Bills
 - bills are a mini group that can belong to a group or not, bills belong to multiple accounts, bills are used to atomic payments where it is clear who paid what
+** Extra sort options
+- Sort by minimum, maximum amount
+- sort group by if you're in them or not, or if a user is in them or not
+** All Expenses Page
+- clicking on a category on categories page takes you to a page showing all expenses, whether they are in a group or not
+- if they are in a group, annotate that they are
