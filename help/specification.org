@@ -1,5 +1,5 @@
-#+title: Expense V2 Project Specification
-#+description: this is going to be some requirements i want to note down for my personal project coming up, note to self: implement requirements in order
+#+title: Expense V2 Project Specification & Documentation
+#+description: this is going to be some requirements and implementation process i want to note down for my personal project, note to self: implement requirements in order
 
 * Important concepts to remember for this project
 ** Denormalization
@@ -9,28 +9,35 @@
 - error handling should be first priority, make sure app is stable to exceptions
 - validation for every field, each page should have validation regardless if its in a complete form
   + this means any switch between pages should first have validation for respective fields, to improve user experience and make sure user provides complete information
+- the nature of this project prevents duplicates of usernames,group names, and category names, make sure validation works so there are no duplicates.
+
+* Current Implementation Practices
+** Dialogs
+- within dialogs, i have decided on using SingleChildScrollView widget, along with a nested column, this is because if the content does not fit on screen, it will be scrollable and elements won't overlap, and at the same time, when using a scrollview widget, it will shrink to the content's size (fixed size), issues with spacing can be solved by using sizedbox with heights
+- within dialogs, without a scrollview widget, spacing is dependant on the size of the window, this means if the window is very large, the nested widgets will stay the same, but the spacing will scale to very weird proportions, since the dialog tries to scale along with the window
 
 * Data structure (in Dartlang and Flutter)
 ** Accounts
 - MVP
-  + id
+  + docId
   + username
+  + groupExpenses
 - Additional Features
   + date created
 ** Expenses
 - MVP
-  + id
+  + docId
   + name
   + amount
   + description
-  + accountId
+  + whopaid
   + groupId
   + category
 - Additional Features
   + date created
 ** Groups
 - MVP
-  + id
+  + docId
   + name
   + description
   + accounts (list of accounts)
@@ -38,7 +45,6 @@
 - Additional Features
   + date created
   + ownerId
-
 * MVP
 ** Basic Crud Functionality
 - View expenses
@@ -56,6 +62,13 @@
 - Account Class Model
   + Account id
   + Account username
+- Attach expenses to account, so all expenses would now have an username attached to them
+  + Updated Expense Class Model
+    * Expense id
+    * Expense name
+    * Expense description (optional)
+    * Expense amount
+    * username
 ** Groups
 - Make groups
 - Edit group name
@@ -67,18 +80,21 @@
   + Group id
   + Group name
   + Group description
+  + accounts
+  + totalExpense
 - Accounts can belong to multiple groups btw
 ** Sorting
 - Sort by dynamic category
 - Add category with creation of expense name
   + this would entail adding another field to expense model (expense category)
     * Updated Expense Class Model
-      + Expense id
-      + Expense name
-      + Expense description (optional)
-      + Expense amount
-      + Expense Category
-- Existing categories should show up with creation of groups, if category already exists, prevent user from creating category
+      - Expense id
+      - Expense name
+      - Expense description (optional)
+      - Expense amount
+      - username
+      - Expense Category
+- Existing categories should show up with creation of expenses, if category already exists during category creation form, prevent user from creating category
   + Said validation tracking should be case insensitive
 - Sorting in group view should work just the same as well
 ** Percentage of expenses in group
