@@ -1,5 +1,33 @@
 #+title: Expense V2 Project Specification & Documentation
+
 #+description: this is going to be some requirements and implementation process i want to note down for my personal project, note to self: implement requirements in order
+
+* Table of Contents :toc:
+- [[#important-concepts-to-remember-for-this-project][Important concepts to remember for this project]]
+  - [[#denormalization][Denormalization]]
+- [[#reminders][Reminders]]
+- [[#current-implementation-practices][Current Implementation Practices]]
+  - [[#dialogs][Dialogs]]
+- [[#data-structure-in-dartlang-and-flutter][Data structure (in Dartlang and Flutter)]]
+  - [[#accounts][Accounts]]
+  - [[#expenses][Expenses]]
+  - [[#groups][Groups]]
+- [[#mvp][MVP]]
+  - [[#basic-crud-functionality][Basic Crud Functionality]]
+  - [[#account-creation][Account creation]]
+  - [[#groups-1][Groups]]
+  - [[#sorting][Sorting]]
+  - [[#percentage-of-expenses-in-group][Percentage of expenses in group]]
+- [[#additional-features][Additional Features]]
+  - [[#additional-metadata][Additional metadata]]
+  - [[#summary-views][Summary Views]]
+  - [[#graphical-improvements][Graphical improvements]]
+  - [[#budgets][Budgets]]
+  - [[#permissions-and-authorization][Permissions and authorization]]
+  - [[#customization][Customization]]
+  - [[#advanced-deletion][Advanced deletion]]
+  - [[#group-invitations][Group Invitations]]
+  - [[#bills][Bills]]
 
 * Important concepts to remember for this project
 ** Denormalization
