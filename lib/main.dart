@@ -48,7 +48,7 @@ class _NavbarState extends State<NavBar> {
     DashboardScreen(),
     PersonalExpensesScreen(),
     GroupsScreen(),
-    CateogoriesScreen(),
+    CategoriesScreen(),
   ];
 
   void _onItemTapped(int index) {

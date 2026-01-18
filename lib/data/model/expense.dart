@@ -44,4 +44,9 @@ class Expense {
       description: map["description"] ?? ""
     );
   }
+
+  @override
+  String toString() {
+    return "Expense($docId, $name, $amount, $description)";
+  }
 }

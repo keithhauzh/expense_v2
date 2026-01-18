@@ -1,6 +1,6 @@
-#+title: Expense V2 Project Specification & Documentation
+#+TITLE: Expense V2 Project Specification & Documentation
 
-#+description: this is going to be some requirements and implementation process i want to note down for my personal project, note to self: implement requirements in order
+#+DESCRIPTION: this is going to be some requirements and implementation process i want to note down for my personal project, note to self: implement requirements in order
 
 * Table of Contents :toc:
 - [[#important-concepts-to-remember-for-this-project][Important concepts to remember for this project]]
@@ -12,6 +12,7 @@
   - [[#accounts][Accounts]]
   - [[#expenses][Expenses]]
   - [[#groups][Groups]]
+  - [[#categories][Categories]]
 - [[#mvp][MVP]]
   - [[#basic-crud-functionality][Basic Crud Functionality]]
   - [[#account-creation][Account creation]]
@@ -69,10 +70,15 @@
   + name
   + description
   + accounts (list of accounts)
-  + totalExpense (sum of all expenses in group)
+  + totalExpenseAmount (sum of all expenses in group)
 - Additional Features
   + date created
   + ownerId
+** Categories
+- MVP
+  + docId
+  + name
+  + totalExpenses
 * MVP
 ** Basic Crud Functionality
 - View expenses
@@ -132,6 +138,7 @@
 ** Additional metadata
 - View creation time and date of expense
 - View creation time and date of group
+- View how many groups are attached to a category
 - View amount of members in a group
   + this would entail an addition in field for group (memberNumber) to track number of members in group, this field is updated appropriately and immediately with modification
 ** Summary Views

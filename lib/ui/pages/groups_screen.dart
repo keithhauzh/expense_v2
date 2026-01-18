@@ -1,3 +1,4 @@
+import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:flutter/material.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -8,8 +9,17 @@ class GroupsScreen extends StatefulWidget {
 }
 
 class _GroupsScreenState extends State<GroupsScreen> {
-  void _triggerModal(){
-    print("triggered modal on groups screen");
+  void _triggerModal() async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddGroupDialog();
+      },
+    );
+
+    if (result == 'OK') {
+      print("Expense Added Successfully");
+    }
   }
 
   @override
