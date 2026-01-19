@@ -28,7 +28,7 @@ class ExpenseRepoFireImpl {
   }
 
   Future<void> addExpense(Expense expense) async {
-    await _collection.doc(expense.docId!).set(expense.toMap());
+    await _collection.add(expense.toMap());
   }
 
   Future<void> updateExpense(Expense expense) async {

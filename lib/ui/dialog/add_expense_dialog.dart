@@ -1,4 +1,3 @@
-
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,8 @@ class AddExpenseDialog extends StatefulWidget {
 }
 
 class _AddExpenseDialogState extends State<AddExpenseDialog> {
+  final repo = ExpenseRepoFireImpl();
+
   String _name = "", _description = "";
   double _amount = 0.0;
   String? _nameError, _descError, _amountError;
@@ -66,8 +67,10 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
     print("Cancelled creation");
   }
 
-  void _onConfirm() {
+  void _onConfirm() async {
     if(_validateFields()){
+      final expense = Expense(name:_name, amount:_amount, description:_description);
+      await repo.addExpense(expense);
       Navigator.pop(context, 'OK');
       print("Successfully added an expense: $_name, $_amount, $_description");
     }

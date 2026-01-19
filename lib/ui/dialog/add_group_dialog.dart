@@ -1,3 +1,5 @@
+import 'package:expense_v2/data/model/group.dart';
+import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class AddGroupDialog extends StatefulWidget {
@@ -8,6 +10,8 @@ class AddGroupDialog extends StatefulWidget {
 }
 
 class _AddGroupDialogState extends State<AddGroupDialog> {
+  final repo = GroupRepoFireImpl();
+
   String _name = "", _description = "";
   double _totalExpenseAmount = 0.0;
   String? _nameError, _descError, _totalExpenseAmountError;
@@ -44,12 +48,12 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
     print("Cancelled creation");
   }
 
-  void _onConfirm() {
+  void _onConfirm() async {
     if(_validateFields()){
+      final group = Group(name: _name, description: _description);
+      await repo.addGroup(group);
       Navigator.pop(context, 'OK');
-      print(
-        "New Group Created: Name: $_name, Description: $_description, TotalExpenseAmount: $_totalExpenseAmount",
-      );
+      print("Successfully added a group: $_name, $_description");
     }
   }
 

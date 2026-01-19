@@ -62,7 +62,6 @@ class _NavbarState extends State<NavBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Expense V2')),
-
       // each of the pages are an index, from 0 to 3
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(

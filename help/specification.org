@@ -29,6 +29,8 @@
   - [[#advanced-deletion][Advanced deletion]]
   - [[#group-invitations][Group Invitations]]
   - [[#bills][Bills]]
+- [[#extras][Extras]]
+  - [[#probable-marks-distribution][Probable Marks Distribution]]
 
 * Important concepts to remember for this project
 ** Denormalization
@@ -165,3 +167,12 @@
 - change group joining to be decided by account instead of owner, owner can invite, account can accept or decline
 ** Bills
 - bills are a mini group that can belong to a group or not, bills belong to multiple accounts, bills are used to atomic payments where it is clear who paid what
+
+* Extras
+** Probable Marks Distribution
+1. Functionality according to the proposal 50%
+2. Code quality, doc for complex logic and error feedback 10%
+3. UI: Responsive, user friendly ui with launcher icon 15%
+4. Everyday github commits and repository structure 10%
+5. Presentation 10%
+6. Submission on time, maintaining constraint like file size 5%
