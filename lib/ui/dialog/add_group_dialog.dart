@@ -13,17 +13,11 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
   final repo = GroupRepoFireImpl();
 
   String _name = "", _description = "";
-  double _totalExpenseAmount = 0.0;
-  String? _nameError, _descError, _totalExpenseAmountError;
+  String? _nameError, _descError;
 
   bool _validateFields(){
-    final nameError = _name.isEmpty ? "Name cannot be empty" : null;
-    final descError = _description.isEmpty ? "Description cannot be empty" : null;
-    setState(() {
-      _nameError = nameError;
-      _descError = descError;
-    });
-    if(_name.isEmpty||_description.isEmpty){
+    if(_name.isEmpty){
+      _nameError = "Name cannot be empty";
       return false;
     }
     return true;

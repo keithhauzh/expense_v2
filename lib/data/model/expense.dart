@@ -3,29 +3,33 @@ class Expense {
   final String name;
   final double amount;
   final String? description;
-  // final String? whopaid;
-  // final int? groupId;
+  // final String whopaid;
+  final int? groupId;
   // final String? category;
 
   Expense({
     this.docId,
     this.name = "",
     this.amount = 0,
-    this.description
-    // required this.username
+    this.description,
+    // this.whopaid = "",
+    this.groupId
   });
 
   Expense copy ({
     String? docId,
     String? name,
     double? amount,
-    String? description
+    String? description,
+    // String? whopaid,
+    String? groupId
   }){
     return Expense(
       docId: docId ?? this.docId,
       name: name ?? this.name,
       amount: amount ?? this.amount,
-      description: description ?? this.description
+      description: description ?? this.description,
+      // whopaid: whopaid ?? this.whopaid
     );
   }
 
@@ -33,7 +37,9 @@ class Expense {
     return {
       "name": name,
       "amount": amount,
-      "description": description
+      "description": description,
+      // "whopaid": whopaid,
+      "groupId": groupId
     };
   }
 
@@ -42,11 +48,12 @@ class Expense {
       name: map["name"] ?? "",
       amount: map["amount"] ?? "",
       description: map["description"] ?? ""
+      // whopaid: map["description"]
     );
   }
 
   @override
   String toString() {
-    return "Expense($docId, $name, $amount, $description)";
+    return "Expense($docId, $name, $amount, $description, $groupId)";
   }
 }

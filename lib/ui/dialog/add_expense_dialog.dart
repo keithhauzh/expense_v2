@@ -15,7 +15,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
 
   String _name = "", _description = "";
   double _amount = 0.0;
-  String? _nameError, _descError, _amountError;
+  String? _nameError, _amountError;
 
 
   // TODO: instead of just using one function, perhaps i can separate it to be functions
@@ -23,14 +23,12 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
     final amountError = _amount<=0 ? "Invalid amount" : null;
-    final descError = _description.isEmpty ? "Name cannot be empty" : null;
     setState(() {
         _nameError = nameError;
         _amountError = amountError;
-        _descError = descError;
     });
     // Error assignments happen before function exits
-    if(_name.isEmpty || _description.isEmpty || _amount<=0.0){
+    if(_name.isEmpty || _amount<=0.0){
       return false;
     }
     return true;
@@ -46,7 +44,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   void _onDescChanged(String value) {
     setState(() {
       _description = value;
-      _descError = null;
     });
   }
 
@@ -112,7 +109,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
                 onChanged: (value) => _onDescChanged(value),
                 decoration: InputDecoration(
                   hintText: "Enter Description",
-                  errorText: _descError,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),

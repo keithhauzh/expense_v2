@@ -1,7 +1,10 @@
 import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
+import 'package:expense_v2/navigation/navigation.dart';
+import 'package:expense_v2/ui/components/group_item.dart';
 import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class GroupsScreen extends StatefulWidget {
   const GroupsScreen({super.key});
@@ -12,6 +15,11 @@ class GroupsScreen extends StatefulWidget {
 
 class _GroupsScreenState extends State<GroupsScreen> {
   final repo = GroupRepoFireImpl();
+
+  void _navigateToGroupView(String id) async {
+    print("group id that we want to navigate with $id");
+    context.pushNamed(Screen.viewGroup.name, pathParameters: {"id": id});
+  }
 
   void _triggerModal() async {
     final result = await showDialog(
@@ -39,7 +47,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                 floating: false,
                 snap: false,
                 flexibleSpace: const FlexibleSpaceBar(
-                  title: Text("Personal Expenses"),
+                  title: Text('Groups'),
                 ),
               ),
               StreamBuilder(
@@ -64,7 +72,15 @@ class _GroupsScreenState extends State<GroupsScreen> {
                     }
 
                     return SliverList.builder(
-                      itemBuilder: (context, index) => {},
+                      itemBuilder: (context, index) => GroupItem(
+                        group: groups[index],
+                        onClickItem: (group) => _navigateToGroupView(group.docId!),
+                      ),
+                      itemCount: groups.length,
+                    );
+                  } else {
+                    return SliverToBoxAdapter(
+                      child: Center(child: Text(asyncData.error.toString())),
                     );
                   }
                 },

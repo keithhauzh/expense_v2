@@ -1,15 +1,12 @@
 class Group {
   final String? docId;
   final String name;
-  final String description;
-  // final List<String> accounts;
-  final double? totalExpenseAmount;
+  final String? description;
 
   Group({
     this.docId,
     this.name = "",
-    this.description = "",
-    this.totalExpenseAmount,
+    this.description,
   });
 
   Group copy({
@@ -22,7 +19,6 @@ class Group {
       docId: docId ?? this.docId,
       name: name ?? this.name,
       description: description ?? this.description,
-      totalExpenseAmount: totalExpenseAmount ?? this.totalExpenseAmount,
     );
   }
 
@@ -30,7 +26,6 @@ class Group {
     return {
       "name": name,
       "description": description,
-      "totalExpenseAmount": totalExpenseAmount,
     };
   }
 
@@ -38,12 +33,11 @@ class Group {
     return Group(
       name: map["name"] ?? "",
       description: map["description"] ?? "",
-      totalExpenseAmount: map["totalExpenseAmount"] ?? "",
     );
   }
 
   @override
   String toString() {
-    return "Group($docId, $name, $description, $totalExpenseAmount)";
+    return "Group($docId, $name, $description)";
   }
 }

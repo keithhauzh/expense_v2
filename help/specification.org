@@ -35,6 +35,7 @@
 * Important concepts to remember for this project
 ** Denormalization
 - delegate calculations or accumulations to write events, for example, totalExpenses should be a field in a group, so that we don't need to find the sum of each expense per account everytime we read a group's expenses
+  + edit: however, due to the data structure of the project, i have decided to use a normalized data structure, i have realized that reading expenses per group is still performant due to expenses having a groupId field, perhaps after mvp is done, some additional metadata could be denormalized if it is easy enough to maintain said data
 
 * Reminders
 - error handling should be first priority, make sure app is stable to exceptions
@@ -52,7 +53,6 @@
 - MVP
   + docId
   + username
-  + groupExpenses
 - Additional Features
   + date created
 ** Expenses
@@ -71,16 +71,15 @@
   + docId
   + name
   + description
-  + accounts (list of accounts)
-  + totalExpenseAmount (sum of all expenses in group)
 - Additional Features
   + date created
   + ownerId
+  + memberCount (denormalized)
 ** Categories
 - MVP
   + docId
   + name
-  + totalExpenses
+
 * MVP
 ** Basic Crud Functionality
 - View expenses

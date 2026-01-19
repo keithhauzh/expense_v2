@@ -1,19 +1,41 @@
 import 'package:expense_v2/data/model/expense.dart';
+import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
 import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
-class PersonalExpensesScreen extends StatefulWidget {
-  const PersonalExpensesScreen({super.key});
+class ViewGroupScreen extends StatefulWidget {
+  const ViewGroupScreen({required this.id, super.key});
+
+  final String id;
 
   @override
-  State<PersonalExpensesScreen> createState() => _PersonalExpensesScreenState();
+  State<ViewGroupScreen> createState() => _ViewGroupScreenState();
 }
 
-class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
-  final repo = ExpenseRepoFireImpl();
+class _ViewGroupScreenState extends State<ViewGroupScreen> {
+  final expenseRepo = ExpenseRepoFireImpl();
+  final groupRepo = GroupRepoFireImpl();
+  Group? group;
+  Group groupData = Group();
+  List<Expense>? expenses;
+
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
+
+  void _init() async {
+    group = await groupRepo.getGroupById(widget.id);
+    // expenses = await expenseRepo.get
+    if(group!=null || expenses!=null){
+      groupData = group!;
+    }
+  }
 
   void _showExpenseDialog(Expense expense) {
     showDialog(
@@ -40,11 +62,6 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      // Using a stack allows us to position certain elements, in this case, a FloatingActionButton widget
-      // at a certain point in the window, we use Positioned widgets to do this, the reason i am using
-      // this implementation instead of a Scaffold and FloatingActionButton is because you should not
-      // nest Scaffold widgets within Scaffold widgets
-      // this page is a nested class inside of main.dart
       children: [
         Positioned.fill(
           child: CustomScrollView(
@@ -54,12 +71,12 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
                 pinned: true,
                 floating: false,
                 snap: false,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Personal Expenses'),
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(groupData.name),
                 ),
               ),
               StreamBuilder(
-                stream: repo.getAllExpenses(),
+                stream: expenseRepo.getAllExpensesInGroup(groupData.name),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
                   if (asyncData.connectionState == ConnectionState.waiting) {
                     // Using non Sliver widgets necessitates a SliverToBoxAdapter
@@ -70,11 +87,11 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
                     final expenses = asyncData.data ?? [];
 
                     if (expenses.isEmpty) {
-                      return const SliverToBoxAdapter(
+                      return SliverToBoxAdapter(
                         child: Center(
                           child: Padding(
                             padding: EdgeInsets.all(20.0),
-                            child: Text('No Expenses Found'),
+                            child: Text('No Expenses found in ${groupData.name}'),
                           ),
                         ),
                       );
@@ -103,7 +120,7 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
           bottom: 16.0,
           child: FloatingActionButton(
             onPressed: _triggerModal,
-            child: Icon(Icons.add),
+            child: Text("Add Expense(s) to Group"),
           ),
         ),
       ],

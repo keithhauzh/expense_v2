@@ -31,7 +31,7 @@ class ExpenseV2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: NavBar());
+    return MaterialApp(home: const NavBar(), routes: {""});
   }
 }
 
@@ -53,56 +53,92 @@ class _NavbarState extends State<NavBar> {
 
   void _onItemTapped(int index) {
     setState(() {
-      // changes the current selected index, this is to switch pages from the nav bar
+      // Changes the current selected index, this is to switch pages from the nav bar
       _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Expense V2')),
-      // each of the pages are an index, from 0 to 3
-      body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-            backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Personal Expenses',
-            backgroundColor: Colors.red,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Groups',
-            backgroundColor: Colors.purple,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Categories',
-            backgroundColor: Colors.green,
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.black,
-        onTap: _onItemTapped,
+    return ShellRoute(
+      builder: (context, state, child) => Scaffold(
+        body: child,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _calculateIndex(state.location),
+          onTap: (index) {
+            if (index == 0) context.go('/home');
+            if (index == 1) context.go('/settings');
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+              backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Personal Expenses',
+              backgroundColor: Colors.red,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'Groups',
+              backgroundColor: Colors.purple,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: 'Categories',
+              backgroundColor: Colors.green,
+            ),
+          ],
+        ),
       ),
+      routes: [
+        GoRoute(
+          path: '/home',
+          builder: (context,state) => const DashboardScreen()
+        ),
+        GoRoute(
+          path: '/personal_expenses',
+          builder: (context, state) => const PersonalExpensesScreen()
+        ),
+        GoRoute(
+          path: '/groups',
+          builder: (context,state) => const GroupsScreen()
+        ),
+        GoRoute(
+          path: '/categories',
+          builder: (context,state) => const CategoriesScreen()
+        )
+      ]
+      //   body: _widgetOptions.elementAt(_selectedIndex),
+      //   bottomNavigationBar: BottomNavigationBar(
+      //     items: const <BottomNavigationBarItem>[
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.dashboard),
+      //         label: 'Dashboard',
+      //         backgroundColor: Colors.blue,
+      //       ),
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.person),
+      //         label: 'Personal Expenses',
+      //         backgroundColor: Colors.red,
+      //       ),
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.people),
+      //         label: 'Groups',
+      //         backgroundColor: Colors.purple,
+      //       ),
+      //       BottomNavigationBarItem(
+      //         icon: Icon(Icons.category),
+      //         label: 'Categories',
+      //         backgroundColor: Colors.green,
+      //       ),
+      //     ],
+      //     currentIndex: _selectedIndex,
+      //     selectedItemColor: Colors.black,
+      //     onTap: _onItemTapped,
+      //   ),
     );
   }
-}
-
-@override
-Widget build(BuildContext context) {
-  return MaterialApp.router(
-    title: 'Expense V2',
-    theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-    routerConfig: GoRouter(
-      initialLocation: Navigation.initial,
-      routes: Navigation.routes,
-    ),
-  );
 }

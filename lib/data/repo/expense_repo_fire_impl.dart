@@ -11,17 +11,28 @@ class ExpenseRepoFireImpl {
 
   final _collection = FirebaseFirestore.instance.collection("expenses");
 
-  Stream<List<Expense>> getAllExpenses(){
+  Stream<List<Expense>> getAllExpenses() {
     return _collection.snapshots().map((event) {
-        return event.docs.map((doc) {
+      return event.docs.map((doc) {
+        return Expense.fromMap(doc.data()).copy(docId: doc.id);
+      }).toList();
+    });
+  }
+
+  Stream<List<Expense>> getAllExpensesInGroup(String? groupName) {
+    return _collection.snapshots().map((event) {
+      return event.docs
+          .map((doc) {
             return Expense.fromMap(doc.data()).copy(docId: doc.id);
-        }).toList();
+          })
+          .where((expense) => expense.name == groupName)
+          .toList();
     });
   }
 
   Future<Expense?> getExpenseById(String docId) async {
     final res = await _collection.doc(docId).get();
-    if(res.data() == null){
+    if (res.data() == null) {
       return null;
     }
     return Expense.fromMap(res.data()!).copy(docId: res.id);
@@ -38,5 +49,4 @@ class ExpenseRepoFireImpl {
   Future<void> deleteExpense(String docId) async {
     await _collection.doc(docId).delete();
   }
-
 }
