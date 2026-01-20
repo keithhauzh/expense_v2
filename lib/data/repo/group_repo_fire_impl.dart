@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/model/group.dart';
+import 'package:flutter/widgets.dart';
 
 class GroupRepoFireImpl {
   static final GroupRepoFireImpl _instance = GroupRepoFireImpl._internal();
@@ -22,7 +22,9 @@ class GroupRepoFireImpl {
 
   Future<Group?> getGroupById(String docId) async {
     final res = await _collection.doc(docId).get();
+    debugPrint(res.toString());
     if (res.data() == null) {
+      debugPrint("data returned is null");
       return null;
     }
     return Group.fromMap(res.data()!).copy(docId: res.id);

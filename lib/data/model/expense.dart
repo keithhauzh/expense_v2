@@ -22,7 +22,9 @@ class Expense {
     double? amount,
     String? description,
     // String? whopaid,
-    String? groupId
+    // The reason i am using groupName for this, 
+    // is so that i can display groupName in personal expenses
+    String? groupName
   }){
     return Expense(
       docId: docId ?? this.docId,

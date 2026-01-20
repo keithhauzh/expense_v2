@@ -8,9 +8,9 @@ import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ViewGroupScreen extends StatefulWidget {
-  const ViewGroupScreen({required this.id, super.key});
+  const ViewGroupScreen({required this.groupId, super.key});
 
-  final String id;
+  final String groupId;
 
   @override
   State<ViewGroupScreen> createState() => _ViewGroupScreenState();
@@ -30,10 +30,14 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
   }
 
   void _init() async {
-    group = await groupRepo.getGroupById(widget.id);
-    // expenses = await expenseRepo.get
-    if(group!=null || expenses!=null){
-      groupData = group!;
+    group = await groupRepo.getGroupById(widget.groupId);
+    if (group != null || expenses != null) {
+      debugPrint(groupData.toString());
+      setState(() {
+        groupData = group!;
+      });
+    } else {
+      debugPrint("group found from groupName is null");
     }
   }
 
@@ -55,7 +59,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
     );
 
     if (result == 'OK') {
-      print("Expense Added Successfully");
+      print("Expense Added Successfully to $groupData.name successfully");
     }
   }
 
@@ -71,9 +75,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
                 pinned: true,
                 floating: false,
                 snap: false,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Text(groupData.name),
-                ),
+                flexibleSpace: FlexibleSpaceBar(title: Text(groupData.name)),
               ),
               StreamBuilder(
                 stream: expenseRepo.getAllExpensesInGroup(groupData.name),
@@ -85,13 +87,14 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
                     );
                   } else if (asyncData.hasData) {
                     final expenses = asyncData.data ?? [];
-
                     if (expenses.isEmpty) {
                       return SliverToBoxAdapter(
                         child: Center(
                           child: Padding(
                             padding: EdgeInsets.all(20.0),
-                            child: Text('No Expenses found in ${groupData.name}'),
+                            child: Text(
+                              'No Expenses found in ${groupData.name}',
+                            ),
                           ),
                         ),
                       );
@@ -118,9 +121,10 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
         Positioned(
           right: 16.0,
           bottom: 16.0,
-          child: FloatingActionButton(
+          child: FloatingActionButton.extended(
             onPressed: _triggerModal,
-            child: Text("Add Expense(s) to Group"),
+            icon: Icon(Icons.add),
+            label: Text("Add Expense to Group"),
           ),
         ),
       ],

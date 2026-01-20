@@ -1,65 +1,126 @@
+import 'package:expense_v2/ui/pages/categories_screen.dart';
+import 'package:expense_v2/ui/pages/dashboard.dart';
+import 'package:expense_v2/ui/pages/groups_screen.dart';
+import 'package:expense_v2/ui/pages/personal_expenses_screen.dart';
+import 'package:expense_v2/ui/pages/view_group_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class Navigation {
-  static const String initial = '/dashboard';
+  final GlobalKey<NavigatorState> rootNavigatorKey;
+  final GlobalKey<NavigatorState> shellNavigatorKey;
+  late final GoRouter router;
 
-  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
+  Navigation()
+    : rootNavigatorKey = GlobalKey<NavigatorState>(),
+      shellNavigatorKey = GlobalKey<NavigatorState>() {
+    router = _createRouter();
+  }
 
-  static Widget _scaffoldWithNavBar(BuildContext context, Widget child){
-    return Scaffold(
-      appBar: AppBar(title:const Text('Expense V2')),
-      body:child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex = _calculateCurrentIndex(context),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Personal Expenses'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Groups'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Category'
-          ),
-        ]
-      ),
+  GoRouter _createRouter() {
+    return GoRouter(
+      navigatorKey: rootNavigatorKey,
+      initialLocation: '/dashboard',
+      routes: [
+        ShellRoute(
+          navigatorKey: shellNavigatorKey,
+          builder: (context, state, child) {
+            final location = state.matchedLocation;
+            return Scaffold(
+              body: child,
+              bottomNavigationBar: BottomNavigationBar(
+                backgroundColor: Colors.blue,
+                selectedItemColor: Colors.black,
+                unselectedItemColor: Colors.blueGrey,
+                currentIndex: _calculateIndex(location),
+                onTap: (index) => _onItemTapped(index, context),
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.dashboard),
+                    label: 'Dashboard'
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Personal Expenses',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.group),
+                    label: 'Groups',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.category),
+                    label: 'Categories',
+                  ),
+                ],
+              ),
+            );
+          },
+          routes: [
+            GoRoute(
+              path: '/dashboard',
+              pageBuilder: (context, state) =>
+                  const MaterialPage(child: DashboardScreen()),
+            ),
+            GoRoute(
+              path: '/personal_expenses',
+              pageBuilder: (context, state) =>
+                  const MaterialPage(child: PersonalExpensesScreen()),
+            ),
+            GoRoute(
+              path: '/groups',
+              pageBuilder: (context, state) =>
+                  const MaterialPage(child: GroupsScreen()),
+                  routes: [
+                    GoRoute(
+                      path: ':groupName',
+                      pageBuilder: (context,state) {
+                        if(state.pathParameters['groupName']!=null) {
+                          final groupId = state.pathParameters['groupName']!;
+                          return MaterialPage(child: ViewGroupScreen(id: groupId));
+                        }else{
+                          return MaterialPage(child: GroupsScreen());
+                        }
+                      }
+                    )
+                  ]
+            ),
+            GoRoute(
+              path: '/categories',
+              pageBuilder: (context, state) =>
+                  const MaterialPage(child: CategoriesScreen()),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  // static in this case means that this funciton belongs to the class itself,
-  // not to any instance of the class, you are able to use this without
-  // instantantiating an instance of this class
-  static int _calculateCurrentIndex(BuildContext context) {
-    final location = GoRouterState.of(context).location;
-    if(location.startsWith('/dashboard')) return 0;
-    if(location.startsWith('/personal')) return 1;
-    if(location.startsWith('/groups')) return 2;
-    if(location.startsWith('/categories')) return 3;
-    return 0;
-  }
-
-  static void _onItemTapped(int index, BuildContext context){
-    switch(index){
-      case 0: context.go('/dashboard');
-      break;
-      case 1: context.go('/personal-expenses');
-      break;
-      case 2: context.go('/groups');
-      break;
-      case 3: context.go('/categories');
-      break;
+  int _calculateIndex(String location) {
+    switch (location) {
+      case '/dashboard':
+        return 0;
+      case '/personal_expenses':
+        return 1;
+      case '/groups':
+        return 2;
+      case '/categories':
+        return 3;
+      default:
+        return 0;
     }
   }
 
-  static final routes = [
-
-  ];
+  void _onItemTapped(int index, BuildContext context) {
+    switch (index) {
+      case 0:
+        context.go('/dashboard');
+      case 1:
+        context.go('/personal_expenses');
+      case 2:
+        context.go('/groups');
+      case 3:
+        context.go('/categories');
+        break;
+    }
+  }
 }

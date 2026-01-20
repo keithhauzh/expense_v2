@@ -1,6 +1,4 @@
-import 'package:expense_v2/navigation/navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

@@ -1,5 +1,3 @@
-import 'package:expense_v2/data/model/expense.dart';
-import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class AddCategoryDialog extends StatefulWidget {
