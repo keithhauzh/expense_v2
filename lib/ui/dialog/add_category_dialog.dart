@@ -31,7 +31,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   void _onConfirm() {
     if (_validateFields()) {
       Navigator.pop(context, 'OK');
-      print("Successfully added a category: $_name");
+      debugPrint("Successfully added a category: $_name");
     }
   }
 

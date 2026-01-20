@@ -76,7 +76,7 @@ class Navigation {
                       pageBuilder: (context,state) {
                         if(state.pathParameters['groupName']!=null) {
                           final groupId = state.pathParameters['groupName']!;
-                          return MaterialPage(child: ViewGroupScreen(id: groupId));
+                          return MaterialPage(child: ViewGroupScreen(groupId: groupId));
                         }else{
                           return MaterialPage(child: GroupsScreen());
                         }

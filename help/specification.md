@@ -166,6 +166,9 @@ group's names on the expenses
 
 ## Additional Features
 
+### Log deletions
+- Because of the nature of the project, it might be a good idea to track logs, so that families who create groups in order to track expenses might want to know if someone has deleted an expense from the group that they previously had registered
+
 ### Additional Metadata
 - View creation date and time of expense.
 - View creation date and time of group.

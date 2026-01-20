@@ -18,7 +18,7 @@ class _CategoriesScreen extends State<CategoriesScreen> {
     );
 
     if (result == 'OK') {
-      print("Categories added successfully");
+      debugPrint("Categories added successfully");
     }
   }
 

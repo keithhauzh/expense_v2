@@ -22,7 +22,6 @@ class GroupRepoFireImpl {
 
   Future<Group?> getGroupById(String docId) async {
     final res = await _collection.doc(docId).get();
-    debugPrint(res.toString());
     if (res.data() == null) {
       debugPrint("data returned is null");
       return null;

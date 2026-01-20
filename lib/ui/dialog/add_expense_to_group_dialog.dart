@@ -2,24 +2,22 @@ import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
+class AddExpenseToGroupDialog extends StatefulWidget {
+  const AddExpenseToGroupDialog({required this.groupName ,super.key});
 
-class AddExpenseDialog extends StatefulWidget {
-  const AddExpenseDialog({super.key});
+  final String groupName;
 
   @override
-  State<AddExpenseDialog> createState() => _AddExpenseDialogState();
+  State<AddExpenseToGroupDialog> createState() => _AddExpenseToGroupState();
 }
 
-class _AddExpenseDialogState extends State<AddExpenseDialog> {
+class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
   final repo = ExpenseRepoFireImpl();
 
   String _name = "", _description = "";
   double _amount = 0.0;
   String? _nameError, _amountError;
 
-
-  // TODO: instead of just using one function, perhaps i can separate it to be functions
-  // per field, so that it follows Single Responsibility Rule (SRP)
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
     final amountError = _amount<=0 ? "Invalid amount" : null;
@@ -27,7 +25,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
         _nameError = nameError;
         _amountError = amountError;
     });
-    // Error assignments happen before function exits
     if(_name.isEmpty || _amount<=0.0){
       return false;
     }
@@ -64,12 +61,14 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
     debugPrint("Cancelled creation");
   }
 
-  void _onConfirm() async {
+  void _onConfirm() {
     if(_validateFields()){
-      final expense = Expense(name:_name, amount:_amount, description:_description);
-      await repo.addExpense(expense);
+      debugPrint(widget.groupName);
+      // final expenseWithGroupName = Expense(name:_name, amount:_amount, description:_description, groupName: widget.groupName);
+
+      // await repo.addExpense(expenseWithGroupName);
       Navigator.pop(context, 'OK');
-      debugPrint("Successfully added an expense: $_name, $_amount, $_description");
+      debugPrint("Successfully added an expense: $_name, $_amount, $_description to ${widget.groupName}");
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_v2/data/model/expense.dart';
+import 'package:expense_v2/data/model/group.dart';
 
 class ExpenseRepoFireImpl {
   static final ExpenseRepoFireImpl _instance = ExpenseRepoFireImpl._internal();
@@ -41,6 +42,11 @@ class ExpenseRepoFireImpl {
   Future<void> addExpense(Expense expense) async {
     await _collection.add(expense.toMap());
   }
+
+  // TODO: this could be used in the future, if we want to add prexisting expenses to groups
+  // Future<void> addExpenseToGroup(Expense expense, String groupName) async {
+  //   await _collection.doc(expense.docId!).update({'groupName': groupName});
+  // }
 
   Future<void> updateExpense(Expense expense) async {
     await _collection.doc(expense.docId!).set(expense.toMap());

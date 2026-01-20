@@ -33,7 +33,7 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
     );
 
     if (result == 'OK') {
-      print("Expense Added Successfully");
+      debugPrint("Expense Added Successfully");
     }
   }
 

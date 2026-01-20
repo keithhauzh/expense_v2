@@ -39,7 +39,7 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
 
   void _onCancel() {
     Navigator.pop(context, "Cancel");
-    print("Cancelled creation");
+    debugPrint("Cancelled creation");
   }
 
   void _onConfirm() async {
@@ -47,7 +47,7 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
       final group = Group(name: _name, description: _description);
       await repo.addGroup(group);
       Navigator.pop(context, 'OK');
-      print("Successfully added a group: $_name, $_description");
+      debugPrint("Successfully added a group: $_name, $_description");
     }
   }
 

@@ -4,7 +4,7 @@ class Expense {
   final double amount;
   final String? description;
   // final String whopaid;
-  final int? groupId;
+  final String? groupName;
   // final String? category;
 
   Expense({
@@ -13,7 +13,9 @@ class Expense {
     this.amount = 0,
     this.description,
     // this.whopaid = "",
-    this.groupId
+    // changed this in favor of using group name for finding expenses per group, 
+    // it is faster when rendering group names on personal expenses screen on every expense
+    this.groupName
   });
 
   Expense copy ({
@@ -32,6 +34,7 @@ class Expense {
       amount: amount ?? this.amount,
       description: description ?? this.description,
       // whopaid: whopaid ?? this.whopaid
+      groupName: groupName ?? this.groupName
     );
   }
 
@@ -41,7 +44,7 @@ class Expense {
       "amount": amount,
       "description": description,
       // "whopaid": whopaid,
-      "groupId": groupId
+      "groupName": groupName
     };
   }
 
@@ -49,13 +52,14 @@ class Expense {
     return Expense(
       name: map["name"] ?? "",
       amount: map["amount"] ?? "",
-      description: map["description"] ?? ""
+      description: map["description"] ?? "",
       // whopaid: map["description"]
+      groupName: map["groupName"] ?? ""
     );
   }
 
   @override
   String toString() {
-    return "Expense($docId, $name, $amount, $description, $groupId)";
+    return "Expense($docId, $name, $amount, $description, $groupName)";
   }
 }

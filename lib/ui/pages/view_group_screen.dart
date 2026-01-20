@@ -32,7 +32,6 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
   void _init() async {
     group = await groupRepo.getGroupById(widget.groupId);
     if (group != null || expenses != null) {
-      debugPrint(groupData.toString());
       setState(() {
         groupData = group!;
       });
@@ -59,7 +58,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
     );
 
     if (result == 'OK') {
-      print("Expense Added Successfully to $groupData.name successfully");
+      debugPrint("Expense Added Successfully to ${groupData.name} successfully");
     }
   }
 
@@ -127,6 +126,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
             label: Text("Add Expense to Group"),
           ),
         ),
+
       ],
     );
   }

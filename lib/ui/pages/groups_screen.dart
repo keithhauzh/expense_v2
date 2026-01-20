@@ -28,7 +28,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     );
 
     if (result == 'OK') {
-      print("Expense Added Successfully");
+      debugPrint("Expense Added Successfully");
     }
   }
 
