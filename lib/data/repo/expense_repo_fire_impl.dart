@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_v2/data/model/expense.dart';
-import 'package:expense_v2/data/model/group.dart';
 
 class ExpenseRepoFireImpl {
   static final ExpenseRepoFireImpl _instance = ExpenseRepoFireImpl._internal();
@@ -26,7 +25,7 @@ class ExpenseRepoFireImpl {
           .map((doc) {
             return Expense.fromMap(doc.data()).copy(docId: doc.id);
           })
-          .where((expense) => expense.name == groupName)
+          .where((expense) => expense.groupName == groupName)
           .toList();
     });
   }

@@ -3,7 +3,7 @@ import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class AddExpenseToGroupDialog extends StatefulWidget {
-  const AddExpenseToGroupDialog({required this.groupName ,super.key});
+  const AddExpenseToGroupDialog({required this.groupName, super.key});
 
   final String groupName;
 
@@ -20,12 +20,12 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
 
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
-    final amountError = _amount<=0 ? "Invalid amount" : null;
+    final amountError = _amount <= 0 ? "Invalid amount" : null;
     setState(() {
-        _nameError = nameError;
-        _amountError = amountError;
+      _nameError = nameError;
+      _amountError = amountError;
     });
-    if(_name.isEmpty || _amount<=0.0){
+    if (_name.isEmpty || _amount <= 0.0) {
       return false;
     }
     return true;
@@ -61,21 +61,26 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
     debugPrint("Cancelled creation");
   }
 
-  void _onConfirm() {
-    if(_validateFields()){
-      debugPrint(widget.groupName);
-      // final expenseWithGroupName = Expense(name:_name, amount:_amount, description:_description, groupName: widget.groupName);
-
-      // await repo.addExpense(expenseWithGroupName);
+  void _onConfirm() async {
+    if (_validateFields()) {
+      final expenseWithGroupName = Expense(
+        name:_name, 
+        amount:_amount, 
+        description:_description, 
+        groupName: widget.groupName
+      );
+      await repo.addExpense(expenseWithGroupName);
       Navigator.pop(context, 'OK');
-      debugPrint("Successfully added an expense: $_name, $_amount, $_description to ${widget.groupName}");
+      debugPrint(
+        "Successfully added an expense: $_name, $_amount, $_description to ${widget.groupName}",
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Add Expense"),
+      title: Text("Add Expense to ${widget.groupName}"),
       content: Padding(
         padding: EdgeInsets.all(5),
         child: SingleChildScrollView(

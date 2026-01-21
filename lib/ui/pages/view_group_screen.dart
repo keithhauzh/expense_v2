@@ -3,7 +3,7 @@ import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
-import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
+import 'package:expense_v2/ui/dialog/add_expense_to_group_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -49,11 +49,11 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
     );
   }
 
-  void _triggerModal() async {
+  void _triggerModal(String groupName) async {
     final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddExpenseDialog();
+        return AddExpenseToGroupDialog(groupName: groupName,);
       },
     );
 
@@ -121,7 +121,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
           right: 16.0,
           bottom: 16.0,
           child: FloatingActionButton.extended(
-            onPressed: _triggerModal,
+            onPressed: () => _triggerModal(groupData.name),
             icon: Icon(Icons.add),
             label: Text("Add Expense to Group"),
           ),
