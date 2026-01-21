@@ -83,6 +83,7 @@ class _AddExistingExpensesToCategoryScreenState
                                     expenseBools[index] = value!;
                                   });
                                 },
+                                // TODO: add functionality for adding expenses to category (confirm button)
                                 title: Text(expenses[index].name),
                                 subtitle: Text(
                                   expenses[index].description ??
