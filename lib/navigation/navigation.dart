@@ -1,7 +1,9 @@
+import 'package:expense_v2/ui/pages/add_existing_expenses_to_category_screen.dart';
 import 'package:expense_v2/ui/pages/categories_screen.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
 import 'package:expense_v2/ui/pages/groups_screen.dart';
 import 'package:expense_v2/ui/pages/personal_expenses_screen.dart';
+import 'package:expense_v2/ui/pages/view_category_screen.dart';
 import 'package:expense_v2/ui/pages/view_group_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +39,7 @@ class Navigation {
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.dashboard),
-                    label: 'Dashboard'
+                    label: 'Dashboard',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),
@@ -70,24 +72,57 @@ class Navigation {
               path: '/groups',
               pageBuilder: (context, state) =>
                   const MaterialPage(child: GroupsScreen()),
-                  routes: [
-                    GoRoute(
-                      path: ':groupName',
-                      pageBuilder: (context,state) {
-                        if(state.pathParameters['groupName']!=null) {
-                          final groupId = state.pathParameters['groupName']!;
-                          return MaterialPage(child: ViewGroupScreen(groupId: groupId));
-                        }else{
-                          return MaterialPage(child: GroupsScreen());
-                        }
-                      }
-                    )
-                  ]
+              routes: [
+                GoRoute(
+                  path: ':groupId',
+                  pageBuilder: (context, state) {
+                    if (state.pathParameters['groupId'] != null) {
+                      final groupId = state.pathParameters['groupId']!;
+                      return MaterialPage(
+                        child: ViewGroupScreen(groupId: groupId),
+                      );
+                    } else {
+                      return MaterialPage(child: GroupsScreen());
+                    }
+                  },
+                ),
+              ],
             ),
             GoRoute(
               path: '/categories',
               pageBuilder: (context, state) =>
                   const MaterialPage(child: CategoriesScreen()),
+              routes: [
+                GoRoute(
+                  path: ':categoryId',
+                  pageBuilder: (context, state) {
+                    if (state.pathParameters['categoryId'] != null) {
+                      final categoryId = state.pathParameters['categoryId']!;
+                      return MaterialPage(
+                        child: ViewCategoryScreen(categoryId: categoryId),
+                      );
+                    } else {
+                      return MaterialPage(child: CategoriesScreen());
+                    }
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'add_expenses',
+                      pageBuilder: (context, state) {
+                        if (state.pathParameters['categoryId'] != null) {
+                          final categoryId =
+                              state.pathParameters['categoryId']!;
+                          return MaterialPage(
+                            child: AddExistingExpensesToCategoryScreen(categoryId: categoryId),
+                          );
+                        } else {
+                          return MaterialPage(child: CategoriesScreen());
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

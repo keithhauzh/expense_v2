@@ -1,3 +1,5 @@
+import 'package:expense_v2/data/model/category.dart';
+import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class AddCategoryDialog extends StatefulWidget {
@@ -8,6 +10,8 @@ class AddCategoryDialog extends StatefulWidget {
 }
 
 class _AddCategoryDialogState extends State<AddCategoryDialog> {
+  final repo = CategoryRepoFireImpl();
+
   String _name = "";
   String? _nameError;
 
@@ -28,10 +32,14 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
     });
   }
 
-  void _onConfirm() {
+  void _onConfirm() async {
     if (_validateFields()) {
+      final category = Category(name: _name);
+      await repo.addCategory(category);
       Navigator.pop(context, 'OK');
       debugPrint("Successfully added a category: $_name");
+    }else{
+      debugPrint("Failed to add category $_name");
     }
   }
 

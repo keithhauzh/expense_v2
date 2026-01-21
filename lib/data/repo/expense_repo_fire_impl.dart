@@ -30,6 +30,20 @@ class ExpenseRepoFireImpl {
     });
   }
 
+  Stream<List<Expense>> getAllExpensesWithoutCategory() {
+    return _collection.snapshots().map((event) {
+      return event.docs
+          .map((doc) {
+            return Expense.fromMap(doc.data()).copy(docId: doc.id);
+          })
+          .where(
+            (expense) =>
+                expense.categoryName!.isEmpty || expense.categoryName == null,
+          )
+          .toList();
+    });
+  }
+
   Future<Expense?> getExpenseById(String docId) async {
     final res = await _collection.doc(docId).get();
     if (res.data() == null) {
