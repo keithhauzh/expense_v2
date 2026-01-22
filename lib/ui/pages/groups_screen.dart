@@ -28,7 +28,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     );
 
     if (result == 'OK') {
-      debugPrint("Expense Added Successfully");
+      debugPrint("Group Added Successfully");
     }
   }
 
@@ -39,13 +39,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
         Positioned.fill(
           child: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                stretch: true,
-                pinned: true,
-                floating: false,
-                snap: false,
-                flexibleSpace: const FlexibleSpaceBar(title: Text('Groups')),
-              ),
               StreamBuilder(
                 stream: repo.getAllGroups(),
                 builder: (context, AsyncSnapshot<List<Group>> asyncData) {

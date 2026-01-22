@@ -1,10 +1,6 @@
-import 'package:expense_v2/ui/pages/add_existing_expenses_to_category_screen.dart';
-import 'package:expense_v2/ui/pages/categories_screen.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
+import 'package:expense_v2/ui/pages/expenses_screen.dart';
 import 'package:expense_v2/ui/pages/groups_screen.dart';
-import 'package:expense_v2/ui/pages/personal_expenses_screen.dart';
-import 'package:expense_v2/ui/pages/view_category_screen.dart';
-import 'package:expense_v2/ui/pages/view_group_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,34 +24,80 @@ class Navigation {
           navigatorKey: shellNavigatorKey,
           builder: (context, state, child) {
             final location = state.matchedLocation;
-            return Scaffold(
-              body: child,
-              bottomNavigationBar: BottomNavigationBar(
-                backgroundColor: Colors.blue,
-                selectedItemColor: Colors.black,
-                unselectedItemColor: Colors.blueGrey,
-                currentIndex: _calculateIndex(location),
-                onTap: (index) => _onItemTapped(index, context),
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dashboard),
-                    label: 'Dashboard',
+            if (location == '/dashboard') {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(
+                    location == '/dashboard' ? 'Dashboard' : 'Expenses',
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Personal Expenses',
+                ),
+                bottomNavigationBar: BottomNavigationBar(
+                  backgroundColor: Colors.white,
+                  selectedItemColor: Colors.black,
+                  unselectedItemColor: Colors.grey,
+                  currentIndex: _calculateIndex(location),
+                  onTap: (index) => _onItemTapped(index, context),
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.dashboard),
+                      label: 'Dashboard',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person),
+                      label: 'Expenses',
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return DefaultTabController(
+                length: 2,
+                child: Scaffold(
+                  body: TabBarView(
+                    children: <Widget>[ExpensesScreen(), GroupsScreen()],
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.group),
-                    label: 'Groups',
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerDocked,
+                  floatingActionButton: FloatingActionButton.extended(
+                    label: Text("Add Expense"),
+                    icon: Icon(Icons.add),
+                    onPressed: () => {
+                      // TODO: check which tab it is on and
+                      // show appropriate dialog
+                      debugPrint("floating action button navigation"),
+                    },
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.category),
-                    label: 'Categories',
+                  appBar: AppBar(
+                    title: Text(
+                      location == '/dashboard' ? 'Dashboard' : 'Expenses',
+                    ),
+                    bottom: TabBar(
+                      tabs: <Widget>[
+                        Tab(text: 'Expenses', icon: Icon(Icons.money)),
+                        Tab(text: 'Groups', icon: Icon(Icons.group)),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            );
+                  bottomNavigationBar: BottomNavigationBar(
+                    backgroundColor: Colors.blue,
+                    selectedItemColor: Colors.black,
+                    unselectedItemColor: Colors.blueGrey,
+                    currentIndex: _calculateIndex(location),
+                    onTap: (index) => _onItemTapped(index, context),
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.dashboard),
+                        label: 'Dashboard',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.person),
+                        label: 'Expenses',
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
           },
           routes: [
             GoRoute(
@@ -64,65 +106,9 @@ class Navigation {
                   const MaterialPage(child: DashboardScreen()),
             ),
             GoRoute(
-              path: '/personal_expenses',
+              path: '/expenses',
               pageBuilder: (context, state) =>
-                  const MaterialPage(child: PersonalExpensesScreen()),
-            ),
-            GoRoute(
-              path: '/groups',
-              pageBuilder: (context, state) =>
-                  const MaterialPage(child: GroupsScreen()),
-              routes: [
-                GoRoute(
-                  path: ':groupId',
-                  pageBuilder: (context, state) {
-                    if (state.pathParameters['groupId'] != null) {
-                      final groupId = state.pathParameters['groupId']!;
-                      return MaterialPage(
-                        child: ViewGroupScreen(groupId: groupId),
-                      );
-                    } else {
-                      return MaterialPage(child: GroupsScreen());
-                    }
-                  },
-                ),
-              ],
-            ),
-            GoRoute(
-              path: '/categories',
-              pageBuilder: (context, state) =>
-                  const MaterialPage(child: CategoriesScreen()),
-              routes: [
-                GoRoute(
-                  path: ':categoryId',
-                  pageBuilder: (context, state) {
-                    if (state.pathParameters['categoryId'] != null) {
-                      final categoryId = state.pathParameters['categoryId']!;
-                      return MaterialPage(
-                        child: ViewCategoryScreen(categoryId: categoryId),
-                      );
-                    } else {
-                      return MaterialPage(child: CategoriesScreen());
-                    }
-                  },
-                  routes: [
-                    GoRoute(
-                      path: 'add_expenses',
-                      pageBuilder: (context, state) {
-                        if (state.pathParameters['categoryId'] != null) {
-                          final categoryId =
-                              state.pathParameters['categoryId']!;
-                          return MaterialPage(
-                            child: AddExistingExpensesToCategoryScreen(categoryId: categoryId),
-                          );
-                        } else {
-                          return MaterialPage(child: CategoriesScreen());
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                  const MaterialPage(child: ExpensesScreen()),
             ),
           ],
         ),
@@ -134,12 +120,8 @@ class Navigation {
     switch (location) {
       case '/dashboard':
         return 0;
-      case '/personal_expenses':
+      case '/expenses':
         return 1;
-      case '/groups':
-        return 2;
-      case '/categories':
-        return 3;
       default:
         return 0;
     }
@@ -150,11 +132,7 @@ class Navigation {
       case 0:
         context.go('/dashboard');
       case 1:
-        context.go('/personal_expenses');
-      case 2:
-        context.go('/groups');
-      case 3:
-        context.go('/categories');
+        context.go('/expenses');
         break;
     }
   }

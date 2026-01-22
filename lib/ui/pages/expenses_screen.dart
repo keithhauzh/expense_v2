@@ -5,14 +5,14 @@ import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
-class PersonalExpensesScreen extends StatefulWidget {
-  const PersonalExpensesScreen({super.key});
+class ExpensesScreen extends StatefulWidget {
+  const ExpensesScreen({super.key});
 
   @override
-  State<PersonalExpensesScreen> createState() => _PersonalExpensesScreenState();
+  State<ExpensesScreen> createState() => _ExpensesScreenState();
 }
 
-class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
+class _ExpensesScreenState extends State<ExpensesScreen> {
   final repo = ExpenseRepoFireImpl();
 
   void _showExpenseDialog(Expense expense) {
@@ -37,6 +37,10 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
     }
   }
 
+  void _triggerSort() async {
+    debugPrint("triggered sort");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -49,15 +53,6 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
         Positioned.fill(
           child: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                stretch: true,
-                pinned: true,
-                floating: false,
-                snap: false,
-                flexibleSpace: const FlexibleSpaceBar(
-                  title: Text('Personal Expenses'),
-                ),
-              ),
               StreamBuilder(
                 stream: repo.getAllExpenses(),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
@@ -100,11 +95,12 @@ class _PersonalExpensesScreenState extends State<PersonalExpensesScreen> {
         ),
 
         Positioned(
-          right: 16.0,
+          left: 16.0,
           bottom: 16.0,
-          child: FloatingActionButton(
-            onPressed: _triggerModal,
-            child: Icon(Icons.add),
+          child: FloatingActionButton.extended(
+            label: Text("All"),
+            onPressed: _triggerSort,
+            icon: Icon(Icons.sort),
           ),
         ),
       ],
