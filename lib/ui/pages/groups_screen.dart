@@ -1,8 +1,8 @@
 import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/group_item.dart';
+import 'package:expense_v2/ui/dialog/view_group_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class GroupsScreen extends StatefulWidget {
   const GroupsScreen({super.key});
@@ -14,9 +14,12 @@ class GroupsScreen extends StatefulWidget {
 class _GroupsScreenState extends State<GroupsScreen> {
   final repo = GroupRepoFireImpl();
 
-  void _navigateToGroupView(String groupName) {
+  void _showGroupDialog(String groupName) {
     debugPrint(groupName);
-    context.go('/expenses/$groupName');
+    showBottomSheet(
+      context: context,
+      builder: (_) => ViewGroupSheet(groupName: groupName),
+    );
   }
 
   void _triggerSort() {
@@ -54,8 +57,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                     return SliverList.builder(
                       itemBuilder: (context, index) => GroupItem(
                         group: groups[index],
-                        onClickItem: (group) =>
-                            _navigateToGroupView(group.name),
+                        onClickItem: (group) => _showGroupDialog(group.name),
                       ),
                       itemCount: groups.length,
                     );
