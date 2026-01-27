@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/model/expense.dart';
 
 class ExpenseRepoFireImpl {
@@ -40,6 +41,17 @@ class ExpenseRepoFireImpl {
             (expense) =>
                 expense.categoryName!.isEmpty || expense.categoryName == null,
           )
+          .toList();
+    });
+  }
+
+  Stream<List<Expense>> getExpensesByCategory(String categoryName) {
+    return _collection.snapshots().map((event) {
+      return event.docs
+          .map((doc) {
+            return Expense.fromMap(doc.data()).copy(docId: doc.id);
+          })
+          .where((expense) => expense.categoryName == categoryName)
           .toList();
     });
   }

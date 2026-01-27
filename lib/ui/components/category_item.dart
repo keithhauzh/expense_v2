@@ -6,9 +6,11 @@ class CategoryItem extends StatelessWidget {
     super.key,
     required this.category,
     required this.onClickItem,
+		this.selected = false
   });
   final Category category;
   final Function(Category) onClickItem;
+	final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,10 @@ class CategoryItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
-                children: [Text(category.name)],
+                children: [
+								Text(category.name),
+								if(selected)Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
+								],
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
+import 'package:expense_v2/ui/dialog/sort_by_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   final repo = ExpenseRepoFireImpl();
+  String? _selectedCategory;
+  List<Expense>? expenses;
 
   void _showExpenseDialog(Expense expense) {
     showDialog(
@@ -24,7 +27,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   void _triggerSort() async {
-    debugPrint("triggered sort");
+    // Here, we wait for the result to come back from sort_by_category_dialog
+    final String? selected = await showDialog(
+      context: context,
+      builder: (_) => SortByCategoryDialog(),
+    );
+    if (selected != null) {
+      setState(() {
+        _selectedCategory = selected;
+      });
+    }
   }
 
   @override
@@ -40,7 +52,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           child: CustomScrollView(
             slivers: [
               StreamBuilder(
-                stream: repo.getAllExpenses(),
+                stream: _selectedCategory == null
+                    ? repo.getAllExpenses()
+                    : repo.getExpensesByCategory(_selectedCategory!),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
                   if (asyncData.connectionState == ConnectionState.waiting) {
                     // Using non Sliver widgets necessitates a SliverToBoxAdapter
@@ -71,7 +85,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     );
                   } else {
                     return SliverToBoxAdapter(
-                      child: Center(child: Text(asyncData.error.toString())));
+                      child: Center(child: Text(asyncData.error.toString())),
+                    );
                   }
                 },
               ),

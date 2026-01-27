@@ -1,4 +1,5 @@
 import 'package:expense_v2/ui/dialog/add_category_dialog.dart';
+import 'package:expense_v2/ui/dialog/add_existing_expense_to_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
@@ -29,11 +30,7 @@ class Navigation {
             final location = state.matchedLocation;
             if (location == '/dashboard') {
               return Scaffold(
-                appBar: AppBar(
-                  title: Text(
-                    location == '/dashboard' ? 'Dashboard' : 'Expenses',
-                  ),
-                ),
+                appBar: AppBar(title: Text('Dashboard')),
                 bottomNavigationBar: BottomNavigationBar(
                   backgroundColor: Colors.white,
                   selectedItemColor: Colors.black,
@@ -103,6 +100,20 @@ class Navigation {
                                         },
                                         child: Text("Add Category"),
                                       ),
+                                      SizedBox(height: 8),
+                                      FilledButton(
+                                        onPressed: () {
+                                          Navigator.pop(bottomSheetContext);
+                                          showDialog(
+                                            context: innerContext,
+                                            builder: (_) =>
+                                                AddExistingExpenseToCategoryDialog(),
+                                          );
+                                        },
+                                        child: Text(
+                                          "Add an existing expense to a category",
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 );
@@ -120,9 +131,7 @@ class Navigation {
                     ),
                   ),
                   appBar: AppBar(
-                    title: Text(
-                      location == '/dashboard' ? 'Dashboard' : 'Expenses',
-                    ),
+                    title: Text('Expenses'),
                     bottom: TabBar(
                       tabs: <Widget>[
                         Tab(text: 'Expenses', icon: Icon(Icons.money)),

@@ -33,13 +33,13 @@ class _AddExistingExpensesToCategoryScreenState
         Positioned.fill(
           child: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                stretch: true,
-                pinned: true,
-                floating: false,
-                snap: false,
-                flexibleSpace: const FlexibleSpaceBar(),
-              ),
+              // SliverAppBar(
+              //   stretch: true,
+              //   pinned: true,
+              //   floating: false,
+              //   snap: false,
+              //   flexibleSpace: const FlexibleSpaceBar(),
+              // ),
               StreamBuilder(
                 stream: expenseRepo.getAllExpensesWithoutCategory(),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
@@ -51,7 +51,7 @@ class _AddExistingExpensesToCategoryScreenState
                     final expenses = asyncData.data ?? [];
 
                     // to ensure both lists have the same length
-                    if(expenseBools.length != expenses.length) {
+                    if (expenseBools.length != expenses.length) {
                       expenseBools = List<bool>.filled(expenses.length, false);
                     }
 

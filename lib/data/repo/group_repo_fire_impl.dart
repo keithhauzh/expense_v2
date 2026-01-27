@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/model/group.dart';
 import 'package:flutter/widgets.dart';
 
