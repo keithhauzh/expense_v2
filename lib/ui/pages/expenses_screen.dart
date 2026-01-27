@@ -1,7 +1,6 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
-import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -24,19 +23,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  void _triggerModal() async {
-    final result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AddExpenseDialog();
-      },
-    );
-
-    if (result == 'OK') {
-      debugPrint("Expense Added Successfully");
-    }
-  }
-
   void _triggerSort() async {
     debugPrint("triggered sort");
   }
@@ -48,7 +34,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       // at a certain point in the window, we use Positioned widgets to do this, the reason i am using
       // this implementation instead of a Scaffold and FloatingActionButton is because you should not
       // nest Scaffold widgets within Scaffold widgets
-      // this page is a nested class inside of main.dart
+      // this page is a nested class inside of main.dart/navigation.dart
       children: [
         Positioned.fill(
           child: CustomScrollView(
@@ -79,14 +65,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       itemBuilder: (context, index) => ExpenseItem(
                         expense: expenses[index],
                         onClickItem: (expense) => _showExpenseDialog(expense),
-                          // safe to index now
+                        // safe to index now
                       ),
                       itemCount: expenses.length,
                     );
                   } else {
                     return SliverToBoxAdapter(
-                      child: Center(child: Text(asyncData.error.toString())),
-                    );
+                      child: Center(child: Text(asyncData.error.toString())));
                   }
                 },
               ),

@@ -1,7 +1,6 @@
 import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/group_item.dart';
-import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,21 +14,13 @@ class GroupsScreen extends StatefulWidget {
 class _GroupsScreenState extends State<GroupsScreen> {
   final repo = GroupRepoFireImpl();
 
-  void _navigateToGroupView(String groupId) async {
-    context.go('/groups/$groupId');
+  void _navigateToGroupView(String groupName) {
+    debugPrint(groupName);
+    context.go('/expenses/$groupName');
   }
 
-  void _triggerModal() async {
-    final result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AddGroupDialog();
-      },
-    );
-
-    if (result == 'OK') {
-      debugPrint("Group Added Successfully");
-    }
+  void _triggerSort() {
+    debugPrint("triggered sort groups");
   }
 
   @override
@@ -64,7 +55,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
                       itemBuilder: (context, index) => GroupItem(
                         group: groups[index],
                         onClickItem: (group) =>
-                            _navigateToGroupView(group.docId!),
+                            _navigateToGroupView(group.name),
                       ),
                       itemCount: groups.length,
                     );
@@ -80,11 +71,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
         ),
 
         Positioned(
-          right: 16.0,
+          left: 16.0,
           bottom: 16.0,
-          child: FloatingActionButton(
-            onPressed: _triggerModal,
-            child: Icon(Icons.add),
+          child: FloatingActionButton.extended(
+            label: Text("Sort"),
+            onPressed: _triggerSort,
+            icon: Icon(Icons.sort),
           ),
         ),
       ],

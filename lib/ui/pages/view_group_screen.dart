@@ -8,9 +8,9 @@ import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ViewGroupScreen extends StatefulWidget {
-  const ViewGroupScreen({required this.groupId, super.key});
+  const ViewGroupScreen({required this.groupName, super.key});
 
-  final String groupId;
+  final String groupName;
 
   @override
   State<ViewGroupScreen> createState() => _ViewGroupScreenState();
@@ -30,7 +30,7 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
   }
 
   void _init() async {
-    group = await groupRepo.getGroupById(widget.groupId);
+    group = await groupRepo.getGroupByName(widget.groupName);
     if (group != null || expenses != null) {
       setState(() {
         groupData = group!;
@@ -53,12 +53,14 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
     final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddExpenseToGroupDialog(groupName: groupName,);
+        return AddExpenseToGroupDialog(groupName: groupName);
       },
     );
 
     if (result == 'OK') {
-      debugPrint("Expense Added Successfully to ${groupData.name} successfully");
+      debugPrint(
+        "Expense Added Successfully to ${groupData.name} successfully",
+      );
     }
   }
 
@@ -126,7 +128,6 @@ class _ViewGroupScreenState extends State<ViewGroupScreen> {
             label: Text("Add Expense to Group"),
           ),
         ),
-
       ],
     );
   }

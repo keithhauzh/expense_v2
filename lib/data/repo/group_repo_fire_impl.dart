@@ -29,6 +29,17 @@ class GroupRepoFireImpl {
     return Group.fromMap(res.data()!).copy(docId: res.id);
   }
 
+  Future<Group?> getGroupByName(String groupName) async {
+    debugPrint("triggered getGroupByName");
+    final res = await _collection.doc(groupName).get();
+    debugPrint(res.data.toString());
+    if (res.data() == null) {
+      debugPrint("data returned is null");
+      return null;
+    }
+    return Group.fromMap(res.data()!).copy(docId: res.id);
+  }
+
   Future<void> addGroup(Group group) async {
     await _collection.add(group.toMap());
   }

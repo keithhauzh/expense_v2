@@ -1,3 +1,6 @@
+import 'package:expense_v2/ui/dialog/add_category_dialog.dart';
+import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
+import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
 import 'package:expense_v2/ui/pages/expenses_screen.dart';
 import 'package:expense_v2/ui/pages/groups_screen.dart';
@@ -58,14 +61,63 @@ class Navigation {
                   ),
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerDocked,
-                  floatingActionButton: FloatingActionButton.extended(
-                    label: Text("Add Expense"),
-                    icon: Icon(Icons.add),
-                    onPressed: () => {
-                      // TODO: check which tab it is on and
-                      // show appropriate dialog
-                      debugPrint("floating action button navigation"),
-                    },
+                  floatingActionButton: Builder(
+                    // Using Builder here gives us a BuildContext located at the
+                    // Builder's place in the widget tree, so that it can see the inherited
+                    // widgets above it, (in this case, DefaultTabController) that a previously
+                    // captured context couldn't.
+                    builder: (innerContext) => FloatingActionButton(
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        final currentIndex = DefaultTabController.of(
+                          innerContext,
+                        ).index;
+                        switch (currentIndex) {
+                          case 0:
+                            showModalBottomSheet(
+                              context: innerContext,
+                              builder: (bottomSheetContext) {
+                                return Padding(
+                                  padding: const EdgeInsetsGeometry.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      FilledButton(
+                                        onPressed: () {
+                                          Navigator.pop(bottomSheetContext);
+                                          showDialog(
+                                            context: innerContext,
+                                            builder: (_) => AddExpenseDialog(),
+                                          );
+                                        },
+                                        child: Text("Add Expense"),
+                                      ),
+                                      SizedBox(height: 8),
+                                      FilledButton(
+                                        onPressed: () {
+                                          Navigator.pop(bottomSheetContext);
+                                          showDialog(
+                                            context: innerContext,
+                                            builder: (_) => AddCategoryDialog(),
+                                          );
+                                        },
+                                        child: Text("Add Category"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                            break;
+                          case 1:
+                            showDialog(
+                              context: innerContext,
+                              builder: (_) => AddGroupDialog(),
+                            );
+                            break;
+                        }
+                      },
+                    ),
                   ),
                   appBar: AppBar(
                     title: Text(
@@ -79,9 +131,9 @@ class Navigation {
                     ),
                   ),
                   bottomNavigationBar: BottomNavigationBar(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.white,
                     selectedItemColor: Colors.black,
-                    unselectedItemColor: Colors.blueGrey,
+                    unselectedItemColor: Colors.grey,
                     currentIndex: _calculateIndex(location),
                     onTap: (index) => _onItemTapped(index, context),
                     items: const [
