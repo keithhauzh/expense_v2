@@ -16,14 +16,46 @@ class _AddExistingExpenseToCategoryDialogState
     extends State<AddExistingExpenseToCategoryDialog> {
   Category? category;
   Category categoryData = Category();
-  List<Expense>? expenses;
+  List<Expense> expenses = <Expense>[];
   List<bool> expenseBools = <bool>[];
-  Category? _selectedValue;
+  String? _selectedCategoryName;
   final categoryRepo = CategoryRepoFireImpl();
   final expenseRepo = ExpenseRepoFireImpl();
 
-  void _onConfirm() {
-    debugPrint("onConfirm");
+  void _onConfirm(List<bool> expenseBools, List<Expense> expenses) {
+    List<Expense> expensesToBeAdded = [];
+    for (int i = 0; i < expenseBools.length; i++) {
+      if (expenseBools[i]) {
+        expensesToBeAdded.add(expenses[i]);
+      }
+    }
+    for (Expense i in expensesToBeAdded) {
+      debugPrint(i.docId);
+      debugPrint(i.name);
+      debugPrint(i.categoryName);
+      debugPrint(i.groupName);
+      debugPrint(i.description);
+      debugPrint(i.amount.toString());
+    }
+    debugPrint(_selectedCategoryName);
+    if (expensesToBeAdded.isNotEmpty && _selectedCategoryName != null) {
+      Expense? currentExpense;
+      for (Expense expense in expensesToBeAdded) {
+        currentExpense = Expense(
+          docId: expense.docId,
+          name: expense.name,
+          amount: expense.amount,
+          description: expense.description,
+          groupName: expense.groupName,
+          categoryName: _selectedCategoryName,
+        );
+        debugPrint(currentExpense.toString());
+        expenseRepo.updateExpense(currentExpense);
+        Navigator.of(context).pop();
+      }
+    } else {
+      debugPrint("expenses is empty or selected category is null");
+    }
   }
 
   @override
@@ -51,35 +83,46 @@ class _AddExistingExpenseToCategoryDialogState
                             width: 140,
                             child: StreamBuilder<List<Category>>(
                               stream: categoryRepo.getAllCategories(),
-                              builder: (ctx, snap) {
-                                if (snap.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  );
-                                }
-                                if (snap.hasError) return const SizedBox();
-                                final categories = snap.data ?? [];
-                                return DropdownButton<Category>(
-                                  value: _selectedValue,
-                                  items: categories
-                                      .map(
-                                        (c) => DropdownMenuItem(
-                                          value: c,
-                                          child: Text(c.name),
+                              builder:
+                                  (
+                                    context,
+                                    AsyncSnapshot<List<Category>> asyncData,
+                                  ) {
+                                    if (asyncData.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
                                         ),
-                                      )
-                                      .toList(),
-                                  onChanged: (c) =>
-                                      setState(() => _selectedValue = c),
-                                  isExpanded: true,
-                                  underline: const SizedBox(),
-                                );
-                              },
+                                      );
+                                    }
+                                    if (asyncData.hasError) {
+                                      return const SizedBox();
+                                    }
+                                    final categories = asyncData.data ?? [];
+                                    return DropdownButton<String>(
+                                      value: _selectedCategoryName,
+                                      items: categories
+                                          .where(
+                                            (category) =>
+                                                category.docId != null,
+                                          )
+                                          .map(
+                                            (category) => DropdownMenuItem(
+                                              value: category.name,
+                                              child: Text(category.name),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (categoryName) => setState(() {
+                                        _selectedCategoryName = categoryName;
+                                      }),
+                                      isExpanded: true,
+                                      underline: const SizedBox(),
+                                    );
+                                  },
                             ),
                           ),
                         ],
@@ -109,7 +152,7 @@ class _AddExistingExpenseToCategoryDialogState
                         );
                       }
 
-                      final expenses = asyncData.data ?? [];
+                      expenses = asyncData.data ?? [];
 
                       if (expenses.length != expenseBools.length) {
                         expenseBools = List<bool>.filled(
@@ -158,7 +201,9 @@ class _AddExistingExpenseToCategoryDialogState
               bottom: 16,
               right: 16,
               child: FloatingActionButton.extended(
-                onPressed: () => _onConfirm,
+                onPressed: () {
+                  _onConfirm(expenseBools, expenses);
+                },
                 icon: Icon(Icons.check),
                 label: Text("Confirm selection"),
               ),
