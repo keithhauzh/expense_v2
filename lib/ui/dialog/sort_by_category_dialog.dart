@@ -3,9 +3,7 @@ import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class SortByCategoryDialog extends StatefulWidget {
-  const SortByCategoryDialog({super.key, this.initialSelected});
-
-  final String? initialSelected;
+  const SortByCategoryDialog({super.key});
 
   @override
   State<SortByCategoryDialog> createState() => _SortByCategoryDialogState();
@@ -13,21 +11,26 @@ class SortByCategoryDialog extends StatefulWidget {
 
 class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
   final repo = CategoryRepoFireImpl();
-  String? _selected;
   List<bool> categoryBools = <bool>[];
+  List<Category> categories = <Category>[];
 
-  @override
-  void initState() {
-    super.initState();
-    _selected = widget.initialSelected;
+  void _sortConfirm() {
+    List<String> categoriesToBeSortedBy = [];
+    for (int i = 0; i < categories.length; i++) {
+      if (categoryBools[i]) {
+        categoriesToBeSortedBy.add(categories[i].name);
+      }
+    }
+    Navigator.of(context).pop(categoriesToBeSortedBy);
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Sort by Category"),
-      content: Padding(
-        padding: EdgeInsets.all(5),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Stack(
           children: [
             Positioned.fill(
@@ -43,7 +46,7 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                               child: Center(child: CircularProgressIndicator()),
                             );
                           } else if (asyncData.hasData) {
-                            final categories = asyncData.data ?? [];
+                             categories = asyncData.data ?? [];
 
                             if (categories.length != categoryBools.length) {
                               categoryBools = List<bool>.filled(
@@ -94,6 +97,14 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                         },
                   ),
                 ],
+              ),
+            ),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                onPressed: _sortConfirm,
+                child: Icon(Icons.check),
               ),
             ),
           ],

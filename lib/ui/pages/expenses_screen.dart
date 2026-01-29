@@ -14,7 +14,7 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   final repo = ExpenseRepoFireImpl();
-  String? _selectedCategory;
+  List<String>? _selectedCategories;
   List<Expense>? expenses;
 
   void _showExpenseDialog(Expense expense) {
@@ -28,13 +28,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   void _triggerSort() async {
     // Here, we wait for the result to come back from sort_by_category_dialog
-    final String? selected = await showDialog(
+    final List<String>? selected = await showDialog(
       context: context,
       builder: (_) => SortByCategoryDialog(),
     );
     if (selected != null) {
       setState(() {
-        _selectedCategory = selected;
+        debugPrint(selected.toString());
+        _selectedCategories = selected;
       });
     }
   }
@@ -52,9 +53,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           child: CustomScrollView(
             slivers: [
               StreamBuilder(
-                stream: _selectedCategory == null
+                stream: _selectedCategories == null
                     ? repo.getAllExpenses()
-                    : repo.getExpensesByCategory(_selectedCategory!),
+                    : repo.getAllExpenses().map(
+                        (expenses) => expenses
+                            .where(
+                              (expense) => _selectedCategories!.contains(
+                                expense.categoryName,
+                              ),
+                            )
+                            .toList(),
+                      ),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
                   if (asyncData.connectionState == ConnectionState.waiting) {
                     // Using non Sliver widgets necessitates a SliverToBoxAdapter

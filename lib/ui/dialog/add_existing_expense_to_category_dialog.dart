@@ -29,15 +29,6 @@ class _AddExistingExpenseToCategoryDialogState
         expensesToBeAdded.add(expenses[i]);
       }
     }
-    for (Expense i in expensesToBeAdded) {
-      debugPrint(i.docId);
-      debugPrint(i.name);
-      debugPrint(i.categoryName);
-      debugPrint(i.groupName);
-      debugPrint(i.description);
-      debugPrint(i.amount.toString());
-    }
-    debugPrint(_selectedCategoryName);
     if (expensesToBeAdded.isNotEmpty && _selectedCategoryName != null) {
       Expense? currentExpense;
       for (Expense expense in expensesToBeAdded) {
