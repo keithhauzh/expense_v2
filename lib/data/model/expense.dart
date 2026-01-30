@@ -10,26 +10,26 @@ class Expense {
   Expense({
     this.docId,
     this.name = "",
-    this.amount = 0,
+    this.amount = 0.0,
     this.description,
     // this.whopaid = "",
-    // changed this in favor of using group name for finding expenses per group, 
+    // changed this in favor of using group name for finding expenses per group,
     // it is faster when rendering group names on personal expenses screen on every expense
     this.groupName,
-    this.categoryName
+    this.categoryName,
   });
 
-  Expense copy ({
+  Expense copy({
     String? docId,
     String? name,
     double? amount,
     String? description,
     // String? whopaid,
-    // The reason i am using groupName for this, 
+    // The reason i am using groupName for this,
     // is so that i can display groupName in personal expenses
     String? groupName,
-    String? categoryName
-  }){
+    String? categoryName,
+  }) {
     return Expense(
       docId: docId ?? this.docId,
       name: name ?? this.name,
@@ -37,29 +37,37 @@ class Expense {
       description: description ?? this.description,
       // whopaid: whopaid ?? this.whopaid
       groupName: groupName ?? this.groupName,
-      categoryName: categoryName ?? this.categoryName
+      categoryName: categoryName ?? this.categoryName,
     );
   }
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       "name": name,
       "amount": amount,
       "description": description,
       // "whopaid": whopaid,
       "groupName": groupName,
-      "categoryName": categoryName
+      "categoryName": categoryName,
     };
   }
 
-  static Expense fromMap(Map<String, dynamic> map){
+  static Expense fromMap(Map<String, dynamic> map) {
+		final rawAmount = map['amount'];
+		double amount = 0.0;
+		if(rawAmount is num){
+			amount = rawAmount.toDouble();
+		}else if(rawAmount is String){
+			amount = double.tryParse(rawAmount) ?? 0.0;
+		}
+
     return Expense(
       name: map["name"] ?? "",
-      amount: map["amount"] ?? "",
+      amount: amount,
       description: map["description"] ?? "",
       // whopaid: map["description"]
       groupName: map["groupName"] ?? "",
-      categoryName: map["categoryName"] ?? ""
+      categoryName: map["categoryName"] ?? "",
     );
   }
 

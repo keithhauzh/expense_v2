@@ -75,7 +75,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       .toList();
 
                   return AspectRatio(
-                    aspectRatio: 3,
+                    aspectRatio: 2,
                     child: Row(
                       children: [
                         const SizedBox(width: 28),
