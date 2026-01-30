@@ -3,7 +3,9 @@ import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class SortByCategoryDialog extends StatefulWidget {
-  const SortByCategoryDialog({super.key});
+  const SortByCategoryDialog({super.key, required this.selectedCategories});
+
+  final List<String> selectedCategories;
 
   @override
   State<SortByCategoryDialog> createState() => _SortByCategoryDialogState();
@@ -11,16 +13,21 @@ class SortByCategoryDialog extends StatefulWidget {
 
 class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
   final repo = CategoryRepoFireImpl();
-  List<bool> categoryBools = <bool>[];
-  List<Category> categories = <Category>[];
+  final Map<String, bool> selectedByName = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (final name in widget.selectedCategories) {
+      selectedByName[name] = true;
+    }
+  }
 
   void _sortConfirm() {
-    List<String> categoriesToBeSortedBy = [];
-    for (int i = 0; i < categories.length; i++) {
-      if (categoryBools[i]) {
-        categoriesToBeSortedBy.add(categories[i].name);
-      }
-    }
+    final categoriesToBeSortedBy = selectedByName.entries
+        .where((e) => e.value)
+        .map((e) => e.key)
+        .toList();
     Navigator.of(context).pop(categoriesToBeSortedBy);
   }
 
@@ -46,12 +53,14 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                               child: Center(child: CircularProgressIndicator()),
                             );
                           } else if (asyncData.hasData) {
-                             categories = asyncData.data ?? [];
+                            final categories = asyncData.data ?? [];
 
-                            if (categories.length != categoryBools.length) {
-                              categoryBools = List<bool>.filled(
-                                categories.length,
-                                false,
+                            for (final category in categories) {
+                              selectedByName.putIfAbsent(
+                                category.name,
+                                () => widget.selectedCategories.contains(
+                                  category.name,
+                                ),
                               );
                             }
 
@@ -65,6 +74,7 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                                 ),
                               );
                             }
+
                             return SliverList(
                               delegate: SliverChildBuilderDelegate(
                                 childCount: categories.length,
@@ -73,10 +83,14 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                                   return Column(
                                     children: [
                                       CheckboxListTile(
-                                        value: categoryBools[index],
+                                        value:
+                                            selectedByName[categories[index]
+                                                .name],
                                         onChanged: (bool? value) {
                                           setState(() {
-                                            categoryBools[index] = value!;
+                                            selectedByName[categories[index]
+                                                    .name] =
+                                                value!;
                                           });
                                         },
                                         title: Text(categories[index].name),

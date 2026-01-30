@@ -14,7 +14,7 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   final repo = ExpenseRepoFireImpl();
-  List<String>? _selectedCategories;
+  List<String>? selectedCategories;
   List<Expense>? expenses;
 
   void _showExpenseDialog(Expense expense) {
@@ -30,12 +30,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     // Here, we wait for the result to come back from sort_by_category_dialog
     final List<String>? selected = await showDialog(
       context: context,
-      builder: (_) => SortByCategoryDialog(),
+      builder: (_) =>
+          SortByCategoryDialog(selectedCategories: selectedCategories ?? []),
     );
     if (selected != null) {
       setState(() {
-        debugPrint(selected.toString());
-        _selectedCategories = selected;
+        selectedCategories = selected;
       });
     }
   }
@@ -53,12 +53,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           child: CustomScrollView(
             slivers: [
               StreamBuilder(
-                stream: _selectedCategories == null
+                stream:
+                    selectedCategories == null || selectedCategories!.isEmpty
                     ? repo.getAllExpenses()
                     : repo.getAllExpenses().map(
                         (expenses) => expenses
                             .where(
-                              (expense) => _selectedCategories!.contains(
+                              (expense) => selectedCategories!.contains(
                                 expense.categoryName,
                               ),
                             )
@@ -107,7 +108,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           left: 16.0,
           bottom: 16.0,
           child: FloatingActionButton.extended(
-            label: Text("All"),
+            label: Text(
+              selectedCategories == null || selectedCategories!.isEmpty
+                  ? "All"
+                  : selectedCategories!.join(", ").toString(),
+            ),
             onPressed: _triggerSort,
             icon: Icon(Icons.sort),
           ),
