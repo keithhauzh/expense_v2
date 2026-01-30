@@ -89,7 +89,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       itemBuilder: (context, index) => ExpenseItem(
                         expense: expenses[index],
                         onClickItem: (expense) => _showExpenseDialog(expense),
-                        // safe to index now
                       ),
                       itemCount: expenses.length,
                     );

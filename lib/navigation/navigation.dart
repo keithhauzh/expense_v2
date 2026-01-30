@@ -31,6 +31,7 @@ class Navigation {
             if (location == '/dashboard') {
               return Scaffold(
                 appBar: AppBar(title: Text('Dashboard')),
+                body: DashboardScreen(),
                 bottomNavigationBar: BottomNavigationBar(
                   backgroundColor: Colors.white,
                   selectedItemColor: Colors.black,
