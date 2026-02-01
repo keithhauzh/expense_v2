@@ -96,7 +96,15 @@ class ExpenseRepoFireImpl {
   }
 
   Future<void> addExpense(Expense expense) async {
-    await _collection.add(expense.toMap());
+    final duplicate = await _collection
+        .where('name', isEqualTo: expense.name)
+        .limit(1)
+        .get();
+    if (duplicate.docs.isNotEmpty) {
+			throw Exception('expense name is taken');
+    }else{
+      await _collection.add(expense.toMap());
+		}
   }
 
   // TODO: this could be used in the future, if we want to add prexisting expenses to groups

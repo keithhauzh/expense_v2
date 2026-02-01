@@ -54,12 +54,23 @@ class _GroupsScreenState extends State<GroupsScreen> {
                       );
                     }
 
-                    return SliverList.builder(
-                      itemBuilder: (context, index) => GroupItem(
-                        group: groups[index],
-                        onClickItem: (group) => _showGroupDialog(group.name),
+                    return SliverPadding(
+                      padding: const EdgeInsets.all(12.0),
+                      sliver: SliverGrid.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12.0,
+                          mainAxisSpacing: 12.0,
+                          childAspectRatio: 1.0,
+                        ),
+                        itemBuilder: (context, index) => GroupItem(
+                          group: groups[index],
+                          onClickItem: (group) =>
+                              _showGroupDialog(group.name),
+                        ),
+                        itemCount: groups.length,
                       ),
-                      itemCount: groups.length,
                     );
                   } else {
                     return SliverToBoxAdapter(

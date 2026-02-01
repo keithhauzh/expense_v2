@@ -3,7 +3,8 @@ import 'package:expense_v2/data/model/category.dart';
 import 'package:flutter/widgets.dart';
 
 class CategoryRepoFireImpl {
-  static final CategoryRepoFireImpl _instance = CategoryRepoFireImpl._internal();
+  static final CategoryRepoFireImpl _instance =
+      CategoryRepoFireImpl._internal();
   CategoryRepoFireImpl._internal();
 
   factory CategoryRepoFireImpl() {
@@ -30,7 +31,15 @@ class CategoryRepoFireImpl {
   }
 
   Future<void> addCategory(Category category) async {
-    await _collection.add(category.toMap());
+    final duplicate = await _collection
+        .where('name', isEqualTo: category.name)
+        .limit(1)
+        .get();
+    if (duplicate.docs.isNotEmpty) {
+      throw Exception('category name is taken');
+    } else {
+      await _collection.add(category.toMap());
+    }
   }
 
   Future<void> updateCategory(Category category) async {

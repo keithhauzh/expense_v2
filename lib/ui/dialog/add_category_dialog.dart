@@ -35,10 +35,16 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   void _onConfirm() async {
     if (_validateFields()) {
       final category = Category(name: _name);
-      await repo.addCategory(category);
-      Navigator.pop(context, 'OK');
-      debugPrint("Successfully added a category: $_name");
-    }else{
+      try {
+        await repo.addCategory(category);
+        Navigator.pop(context, 'OK');
+        debugPrint("Successfully added a category: $_name");
+      } on Exception catch (e) {
+        setState(() {
+          _nameError = e.toString();
+        });
+      }
+    } else {
       debugPrint("Failed to add category $_name");
     }
   }

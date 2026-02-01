@@ -42,7 +42,15 @@ class GroupRepoFireImpl {
   }
 
   Future<void> addGroup(Group group) async {
-    await _collection.add(group.toMap());
+    final duplicate = await _collection
+        .where('name', isEqualTo: group.name)
+        .limit(1)
+        .get();
+    if (duplicate.docs.isNotEmpty) {
+      throw Exception('group name is taken');
+    } else {
+      await _collection.add(group.toMap());
+    }
   }
 
   Future<void> updateGroup(Group group) async {

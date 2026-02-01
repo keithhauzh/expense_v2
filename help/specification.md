@@ -15,6 +15,7 @@ TODO: check if all backend apis have auth verification handling. []
 TODO: show percentage of expenses according to total expense in group per group. []
 TODO: dialog for confirmation on sign out. []
 TODO: delete unused pages. []
+TODO: check all apis for duplicate groups and categories when creating (prevent duplicates). []
 
 ## Important Concepts to Remember for This Project
 

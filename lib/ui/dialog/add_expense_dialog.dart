@@ -83,7 +83,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
           "Successfully added an expense: $_name, $_amount, $_description",
         );
       } on Exception catch (e) {
-        context.go('/login');
+				// TODO: have different exceptions for user not logged in 
+				//  and expense name already taken
         debugPrint(
           "Something went wrong when trying to create an expense: ${e.toString()}",
         );
