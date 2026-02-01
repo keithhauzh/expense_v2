@@ -17,21 +17,35 @@ class UserRepoFireImpl {
     String username,
     String password,
   ) async {
-		// Don't do a try and catch here, we do in the frontend side so we 
-		// can setState and show error
-		// to the user
-    debugPrint("email: $email,  username: $username,  password: $password");
-    final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email.trim(),
-      password: password.trim(),
-    );
-    final uid = cred.user!.uid;
-    await _collection.doc(uid).set({
-      'uid': uid,
-      'email': email.trim(),
-      'username': username,
-    });
-    return cred;
+    final normUsername = username.trim();
+    final normEmail = email.trim();
+
+    // Check if username is already taken
+    final user = await _collection
+        .where('username', isEqualTo: normUsername)
+        .limit(1)
+        .get();
+    if (user.docs.isNotEmpty) {
+			// This exception needs to be caught at the 
+			// try and catch at the frontend side
+			// to be displayed to the user
+      throw Exception('username is taken');
+    } else {
+      // Don't do a try and catch here, we do in the frontend side so we
+      // can setState and show error
+      // to the user
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: normEmail,
+        password: password.trim(),
+      );
+      final uid = cred.user!.uid;
+      await _collection.doc(uid).set({
+        'uid': uid,
+        'email': normEmail,
+        'username': normUsername,
+      });
+      return cred;
+    }
   }
 
   Future<void> signOut() async {
@@ -45,7 +59,7 @@ class UserRepoFireImpl {
   }
 
   Future<UserCredential> login(String email, String password) async {
-		// Don't do a try and catch here (2)
+    // Don't do a try and catch here (2)
     final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email.trim(),
       password: password.trim(),

@@ -1,6 +1,5 @@
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:expense_v2/data/model/user.dart' as user_type;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,6 +62,13 @@ class _SignupScreenState extends State<SignupScreen> {
         await repo.signUp(_email, _username, _password);
         context.go('/dashboard');
       } on FirebaseAuthException catch (e) {
+        setState(() {
+          _passError = e.toString();
+        });
+      } on Exception catch (e) {
+				// This catch should be showing that username
+				// already exists if user tries to use a prexisting
+				// username
         setState(() {
           _passError = e.toString();
         });

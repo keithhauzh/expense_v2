@@ -64,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go("/dashboard");
       } on FirebaseAuthException catch (e) {
         setState(() {
-          _passError = e.toString();
+          _nameError = e.toString();
         });
       } catch (e) {
         setState(() {
