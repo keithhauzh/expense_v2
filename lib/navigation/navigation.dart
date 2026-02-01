@@ -1,3 +1,4 @@
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/dialog/add_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_existing_expense_to_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
@@ -12,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class Navigation {
+  final userRepo = UserRepoFireImpl();
+
   final GlobalKey<NavigatorState> rootNavigatorKey;
   final GlobalKey<NavigatorState> shellNavigatorKey;
   late final GoRouter router;
@@ -48,7 +51,18 @@ class Navigation {
             final location = state.matchedLocation;
             if (location == '/dashboard') {
               return Scaffold(
-                appBar: AppBar(title: Text('Dashboard')),
+                appBar: AppBar(
+                  title: Text('Dashboard'),
+                  actions: [
+                    IconButton(
+                      onPressed: () async {
+                        userRepo.signOut();
+                        context.go('/login');
+                      },
+                      icon: Icon(Icons.exit_to_app),
+                    ),
+                  ],
+                ),
                 body: DashboardScreen(),
                 bottomNavigationBar: BottomNavigationBar(
                   backgroundColor: Colors.white,
@@ -151,6 +165,15 @@ class Navigation {
                   ),
                   appBar: AppBar(
                     title: Text('Expenses'),
+                    actions: [
+                      IconButton(
+                        onPressed: () async {
+                          userRepo.signOut();
+                          context.go('/login');
+                        },
+                        icon: Icon(Icons.exit_to_app),
+                      ),
+                    ],
                     bottom: TabBar(
                       tabs: <Widget>[
                         Tab(text: 'Expenses', icon: Icon(Icons.money)),

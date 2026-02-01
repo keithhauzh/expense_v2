@@ -1,3 +1,5 @@
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,6 +11,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final repo = UserRepoFireImpl();
+
   String _username = "", _email = "", _password = "";
   String? _nameError, _passError, _emailError;
 
@@ -17,8 +21,16 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   bool _validateFields() {
+    if (_email.isEmpty) {
+      _emailError = "email cannot be empty";
+      return false;
+    }
     if (_username.isEmpty) {
       _nameError = "username cannot be empty";
+      return false;
+    }
+    if (_password.isEmpty) {
+      _passError = "password cannot be empty";
       return false;
     }
     return true;
@@ -45,23 +57,21 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<void> _onConfirm() async {
-    // TODO: logic for logging in
-    debugPrint("logging in placeholder");
-    // if (_validateFields()) {
-    //   try {
-    //     final cred = await FirebaseAuth.instance.login(
-    //       email: _username.trim(),
-    //       password: _password,
-    //     );
-    //     debugPrint(cred.toString());
-    //     context.go('/dashboard');
-    //   } on FirebaseAuthException catch (error) {
-    //     setState(() {
-    //       _passError = error.message;
-    //     });
-    //   }
-    // }
+  void _onConfirm() async {
+    if (_validateFields()) {
+      try {
+        await repo.login(_email, _password);
+        context.go("/dashboard");
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _passError = e.toString();
+        });
+      } catch (e) {
+        setState(() {
+          _passError = "Login failed, please try again";
+        });
+      }
+    }
   }
 
   @override

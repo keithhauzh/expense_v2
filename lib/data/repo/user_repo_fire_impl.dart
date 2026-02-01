@@ -17,10 +17,13 @@ class UserRepoFireImpl {
     String username,
     String password,
   ) async {
-		debugPrint("email: $email,  username: $username,  password: $password");
+		// Don't do a try and catch here, we do in the frontend side so we 
+		// can setState and show error
+		// to the user
+    debugPrint("email: $email,  username: $username,  password: $password");
     final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email.trim(),
-      password: password,
+      password: password.trim(),
     );
     final uid = cred.user!.uid;
     await _collection.doc(uid).set({
@@ -28,6 +31,25 @@ class UserRepoFireImpl {
       'email': email.trim(),
       'username': username,
     });
+    return cred;
+  }
+
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } on FirebaseAuthException catch (e) {
+      debugPrint("Firestore error: ${e.toString()}");
+    } catch (_) {
+      debugPrint("Failed to log out");
+    }
+  }
+
+  Future<UserCredential> login(String email, String password) async {
+		// Don't do a try and catch here (2)
+    final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password.trim(),
+    );
     return cred;
   }
 }
