@@ -2,6 +2,7 @@ import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
 class AddExistingExpenseToCategoryDialog extends StatefulWidget {
@@ -14,13 +15,14 @@ class AddExistingExpenseToCategoryDialog extends StatefulWidget {
 
 class _AddExistingExpenseToCategoryDialogState
     extends State<AddExistingExpenseToCategoryDialog> {
+  final userRepo = UserRepoFireImpl();
+  final categoryRepo = CategoryRepoFireImpl();
+  final expenseRepo = ExpenseRepoFireImpl();
   Category? category;
   Category categoryData = Category();
   List<Expense> expenses = <Expense>[];
   List<bool> expenseBools = <bool>[];
   String? _selectedCategoryName;
-  final categoryRepo = CategoryRepoFireImpl();
-  final expenseRepo = ExpenseRepoFireImpl();
 
   void _onConfirm(List<bool> expenseBools, List<Expense> expenses) {
     List<Expense> expensesToBeAdded = [];
@@ -39,6 +41,7 @@ class _AddExistingExpenseToCategoryDialogState
           description: expense.description,
           groupName: expense.groupName,
           categoryName: _selectedCategoryName,
+          whopaid: expense.whopaid,
         );
         debugPrint(currentExpense.toString());
         expenseRepo.updateExpense(currentExpense);

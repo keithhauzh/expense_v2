@@ -19,6 +19,18 @@ class ExpenseRepoFireImpl {
     });
   }
 
+  Stream<List<Expense>> getAllExpensesForCurrentUser(String currentUsername) {
+    return _collection.snapshots().map((event) {
+      // TODO: potentially rework logic? check user_repo_fire_impl.dart
+      return event.docs
+          .map((doc) {
+            return Expense.fromMap(doc.data()).copy(docId: doc.id);
+          })
+          .where((expense) => expense.whopaid == currentUsername)
+          .toList();
+    });
+  }
+
   Stream<List<Expense>> getAllExpensesInGroup(String? groupName) {
     return _collection.snapshots().map((event) {
       return event.docs

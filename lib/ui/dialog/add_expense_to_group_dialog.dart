@@ -1,6 +1,8 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddExpenseToGroupDialog extends StatefulWidget {
   const AddExpenseToGroupDialog({required this.groupName, super.key});
@@ -12,7 +14,8 @@ class AddExpenseToGroupDialog extends StatefulWidget {
 }
 
 class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
-  final repo = ExpenseRepoFireImpl();
+  final userRepo = UserRepoFireImpl();
+  final expenseRepo = ExpenseRepoFireImpl();
 
   String _name = "", _description = "";
   double _amount = 0.0;
@@ -63,17 +66,33 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
 
   void _onConfirm() async {
     if (_validateFields()) {
-      final expenseWithGroupName = Expense(
-        name:_name, 
-        amount:_amount, 
-        description:_description, 
-        groupName: widget.groupName
-      );
-      await repo.addExpense(expenseWithGroupName);
-      Navigator.pop(context, 'OK');
-      debugPrint(
-        "Successfully added an expense: $_name, $_amount, $_description to ${widget.groupName}",
-      );
+      try {
+        final username = await userRepo.getUsername();
+        final expenseWithGroupName = Expense(
+          name: _name,
+          amount: _amount,
+          description: _description,
+          groupName: widget.groupName,
+          whopaid: username,
+        );
+        await expenseRepo.addExpense(expenseWithGroupName);
+        if (!mounted) return;
+        Navigator.pop(context, 'OK');
+        debugPrint(
+          "Successfully added an expense: $_name, $_amount, $_description to ${widget.groupName}",
+        );
+      } on Exception catch (e) {
+        context.go('/login');
+        debugPrint(
+          "Something went wrong when trying to create an expense: ${e.toString()}",
+        );
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          // TODO: maybe a modal to show error
+          _nameError = "Failed to add expense.";
+        });
+      }
     }
   }
 

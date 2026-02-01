@@ -4,6 +4,15 @@
 > This is a set of requirements and implementation notes for my personal project.  
 > **Note to self:** Implement requirements in order.
 
+# TODOS:
+TODO: check if going back in navigation allows not signed in user to write stuff anyway. []
+TODO: in the pie chart, for uncategorized expenses, show a section for them. []
+TODO: make sure navigator pop doesn't crash the app, check for !mounted on everything. []
+TODO: rework group view ui. []
+TODO: denormalization applied. []
+TODO: test if login fields function properly (normalized/trimmed usernames and emails, invalid emails). []
+TODO: check if all backend apis have auth verification handling. []
+
 ## Important Concepts to Remember for This Project
 
 ### Denormalization

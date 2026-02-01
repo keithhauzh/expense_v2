@@ -26,9 +26,9 @@ class UserRepoFireImpl {
         .limit(1)
         .get();
     if (user.docs.isNotEmpty) {
-			// This exception needs to be caught at the 
-			// try and catch at the frontend side
-			// to be displayed to the user
+      // This exception needs to be caught at the
+      // try and catch at the frontend side
+      // to be displayed to the user
       throw Exception('username is taken');
     } else {
       // Don't do a try and catch here, we do in the frontend side so we
@@ -65,5 +65,18 @@ class UserRepoFireImpl {
       password: password.trim(),
     );
     return cred;
+  }
+
+  Future<String> getUsername() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    String uid = "";
+    if (currentUser == null) {
+      throw Exception("Please sign in first.");
+    } else {
+      uid = currentUser.uid;
+    }
+    final user = await _collection.doc(uid).get();
+    final username = (user.data()?['username'] as String?) ?? '';
+    return username;
   }
 }

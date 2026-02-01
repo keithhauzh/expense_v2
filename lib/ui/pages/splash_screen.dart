@@ -13,9 +13,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void _init() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
-				debugPrint(user.toString());
         context.go('/login');
       } else {
+				debugPrint("Signed in user: ${user.toString()}");
         context.go('/dashboard');
       }
     });

@@ -1,7 +1,8 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 
 class AddExpenseDialog extends StatefulWidget {
   const AddExpenseDialog({super.key});
@@ -11,24 +12,24 @@ class AddExpenseDialog extends StatefulWidget {
 }
 
 class _AddExpenseDialogState extends State<AddExpenseDialog> {
-  final repo = ExpenseRepoFireImpl();
+  final userRepo = UserRepoFireImpl();
+  final expenseRepo = ExpenseRepoFireImpl();
 
   String _name = "", _description = "";
   double _amount = 0.0;
   String? _nameError, _amountError;
 
-
   // TODO: instead of just using one function, perhaps i can separate it to be functions
   // per field, so that it follows Single Responsibility Rule (SRP)
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
-    final amountError = _amount<=0 ? "Invalid amount" : null;
+    final amountError = _amount <= 0 ? "Invalid amount" : null;
     setState(() {
-        _nameError = nameError;
-        _amountError = amountError;
+      _nameError = nameError;
+      _amountError = amountError;
     });
     // Error assignments happen before function exits
-    if(_name.isEmpty || _amount<=0.0){
+    if (_name.isEmpty || _amount <= 0.0) {
       return false;
     }
     return true;
@@ -65,11 +66,34 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   }
 
   void _onConfirm() async {
-    if(_validateFields()){
-      final expense = Expense(name:_name, amount:_amount, description:_description);
-      await repo.addExpense(expense);
-      Navigator.pop(context, 'OK');
-      debugPrint("Successfully added an expense: $_name, $_amount, $_description");
+    if (_validateFields()) {
+      try {
+        final username = await userRepo.getUsername();
+        final expense = Expense(
+          name: _name,
+          amount: _amount,
+          description: _description,
+          whopaid: username,
+        );
+        debugPrint(expense.toString());
+        await expenseRepo.addExpense(expense);
+        if (!mounted) return;
+        Navigator.pop(context, 'OK');
+        debugPrint(
+          "Successfully added an expense: $_name, $_amount, $_description",
+        );
+      } on Exception catch (e) {
+        context.go('/login');
+        debugPrint(
+          "Something went wrong when trying to create an expense: ${e.toString()}",
+        );
+      } catch (e) {
+        if (!mounted) return;
+        debugPrint(e.toString());
+        setState(() {
+          _nameError = "Failed to add expense.";
+        });
+      }
     }
   }
 

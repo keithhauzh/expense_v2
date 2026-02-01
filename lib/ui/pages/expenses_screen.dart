@@ -1,9 +1,11 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
 import 'package:expense_v2/ui/dialog/sort_by_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -13,9 +15,44 @@ class ExpensesScreen extends StatefulWidget {
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  final repo = ExpenseRepoFireImpl();
+  final expenseRepo = ExpenseRepoFireImpl();
+  final userRepo = UserRepoFireImpl();
   List<String>? selectedCategories;
   List<Expense>? expenses;
+  String? username;
+  bool _loading = true;
+
+  Future<void> _init(BuildContext context) async {
+    try {
+      // We use mounted here to prevent state problems
+      // with navigation
+      //
+      // Mounted is used for checking if
+      // the state object we are operating on
+      // is currently active in the widget tree
+      // this is helps avoid erros when performing
+      // async operations
+      username = await userRepo.getUsername();
+      if (username == null || username!.isEmpty) {
+        if (mounted) context.go('/login');
+        debugPrint("Please sign in first.");
+        return;
+      }
+			// We set _loading to be false if username
+			// is not null
+      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) {
+        context.go('/login');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init(context);
+  }
 
   void _showExpenseDialog(Expense expense) {
     showDialog(
@@ -42,6 +79,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Stack(
       // Using a stack allows us to position certain elements, in this case, a FloatingActionButton widget
       // at a certain point in the window, we use Positioned widgets to do this, the reason i am using
@@ -55,16 +96,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               StreamBuilder(
                 stream:
                     selectedCategories == null || selectedCategories!.isEmpty
-                    ? repo.getAllExpenses()
-                    : repo.getAllExpenses().map(
-                        (expenses) => expenses
-                            .where(
-                              (expense) => selectedCategories!.contains(
-                                expense.categoryName,
-                              ),
-                            )
-                            .toList(),
-                      ),
+                    ? expenseRepo.getAllExpensesForCurrentUser(username!)
+                    : expenseRepo
+                          .getAllExpensesForCurrentUser(username!)
+                          .map(
+                            (expenses) => expenses
+                                .where(
+                                  (expense) => selectedCategories!.contains(
+                                    expense.categoryName,
+                                  ),
+                                )
+                                .toList(),
+                          ),
                 builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
                   if (asyncData.connectionState == ConnectionState.waiting) {
                     // Using non Sliver widgets necessitates a SliverToBoxAdapter
