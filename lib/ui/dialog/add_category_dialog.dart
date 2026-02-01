@@ -23,7 +23,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       return false;
     }
     return true;
-  }
+ }
 
   void _onNameChanged(String value) {
     setState(() {
@@ -35,17 +35,15 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   void _onConfirm() async {
     if (_validateFields()) {
       final category = Category(name: _name);
-      try {
-        await repo.addCategory(category);
+      final addedCategory = await repo.addCategory(category);
+      if (addedCategory) {
+        if (!mounted) return;
         Navigator.pop(context, 'OK');
-        debugPrint("Successfully added a category: $_name");
-      } on Exception catch (e) {
+      } else {
         setState(() {
-          _nameError = e.toString();
+          _nameError = "category name is already taken";
         });
       }
-    } else {
-      debugPrint("Failed to add category $_name");
     }
   }
 

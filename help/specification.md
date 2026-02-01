@@ -6,6 +6,7 @@
 
 # TODOS:
 TODO: check if going back in navigation allows not signed in user to write stuff anyway. []
+TODO: disable stock splash screen and use custom instead
 TODO: in the pie chart, for uncategorized expenses, show a section for them. []
 TODO: make sure navigator pop doesn't crash the app, check for !mounted on everything. []
 TODO: rework group view ui. []

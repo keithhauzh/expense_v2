@@ -30,15 +30,16 @@ class CategoryRepoFireImpl {
     return Category.fromMap(res.data()!).copy(docId: res.id);
   }
 
-  Future<void> addCategory(Category category) async {
+  Future<bool> addCategory(Category category) async {
     final duplicate = await _collection
         .where('name', isEqualTo: category.name)
         .limit(1)
         .get();
     if (duplicate.docs.isNotEmpty) {
-      throw Exception('category name is taken');
+      return false;
     } else {
       await _collection.add(category.toMap());
+      return true;
     }
   }
 

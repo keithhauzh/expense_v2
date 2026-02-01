@@ -2,7 +2,6 @@ import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AddExpenseDialog extends StatefulWidget {
   const AddExpenseDialog({super.key});
@@ -20,7 +19,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   String? _nameError, _amountError;
 
   // TODO: instead of just using one function, perhaps i can separate it to be functions
-  // per field, so that it follows Single Responsibility Rule (SRP)
+  //  per field, so that it follows Single Responsibility Rule (SRP)
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
     final amountError = _amount <= 0 ? "Invalid amount" : null;
@@ -76,21 +75,18 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
           whopaid: username,
         );
         debugPrint(expense.toString());
-        await expenseRepo.addExpense(expense);
-        if (!mounted) return;
-        Navigator.pop(context, 'OK');
-        debugPrint(
-          "Successfully added an expense: $_name, $_amount, $_description",
-        );
+        final addedExpense = await expenseRepo.addExpense(expense);
+        if (addedExpense) {
+          if (!mounted) return;
+          Navigator.pop(context, 'OK');
+        } else {
+          _nameError = "expense name is already taken";
+        }
       } on Exception catch (e) {
-				// TODO: have different exceptions for user not logged in 
-				//  and expense name already taken
-        debugPrint(
-          "Something went wrong when trying to create an expense: ${e.toString()}",
-        );
-      } catch (e) {
-        if (!mounted) return;
-        debugPrint(e.toString());
+        setState(() {
+          _nameError = e.toString();
+        });
+      } catch (_) {
         setState(() {
           _nameError = "Failed to add expense.";
         });

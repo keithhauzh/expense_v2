@@ -17,7 +17,9 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
 
   bool _validateFields() {
     if (_name.isEmpty) {
-      _nameError = "Name cannot be empty";
+      setState(() {
+        _nameError = "Name cannot be empty";
+      });
       return false;
     }
     return true;
@@ -45,15 +47,14 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
   void _onConfirm() async {
     if (_validateFields()) {
       final group = Group(name: _name, description: _description);
-      try {
-        await repo.addGroup(group);
+      final addedGroup = await repo.addGroup(group);
+      if (addedGroup) {
         if (!mounted) return;
         Navigator.pop(context, 'OK');
-        debugPrint("Successfully added a group: $_name, $_description");
-      } on Exception catch (e) {
-        _nameError = e.toString();
-      } catch (_) {
-        _nameError = "Something went wrong.";
+      } else {
+        setState(() {
+          _nameError = "group name is already taken";
+        });
       }
     }
   }
