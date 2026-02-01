@@ -5,6 +5,9 @@ import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
 import 'package:expense_v2/ui/pages/expenses_screen.dart';
 import 'package:expense_v2/ui/pages/groups_screen.dart';
+import 'package:expense_v2/ui/pages/login_screen.dart';
+import 'package:expense_v2/ui/pages/signup_screen.dart';
+import 'package:expense_v2/ui/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,8 +25,23 @@ class Navigation {
   GoRouter _createRouter() {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: '/dashboard',
+      initialLocation: '/splash',
       routes: [
+        GoRoute(
+          path: '/splash',
+          pageBuilder: (context, state) =>
+              const MaterialPage(child: SplashScreen()),
+        ),
+        GoRoute(
+          path: '/login',
+          pageBuilder: (context, state) =>
+              const MaterialPage(child: LoginScreen()),
+        ),
+        GoRoute(
+          path: '/signup',
+          pageBuilder: (context, state) =>
+              const MaterialPage(child: SignupScreen()),
+        ),
         ShellRoute(
           navigatorKey: shellNavigatorKey,
           builder: (context, state, child) {

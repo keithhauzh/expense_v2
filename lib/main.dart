@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final navigation = Navigation();
-  runApp(MaterialApp.router(routerConfig: navigation.router));
+  runApp(
+    MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      routerConfig: navigation.router,
+    ),
+  );
 }
