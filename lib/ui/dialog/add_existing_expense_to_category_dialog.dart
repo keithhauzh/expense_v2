@@ -4,6 +4,7 @@ import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddExistingExpenseToCategoryDialog extends StatefulWidget {
   const AddExistingExpenseToCategoryDialog({super.key});
@@ -23,8 +24,51 @@ class _AddExistingExpenseToCategoryDialogState
   List<Expense> expenses = <Expense>[];
   List<bool> expenseBools = <bool>[];
   String? _selectedCategoryName;
+  String? username;
+  bool _loading = true;
 
-  void _onConfirm(List<bool> expenseBools, List<Expense> expenses) {
+  Future<void> _init(BuildContext context) async {
+		// TODO: move this to a helper function?
+
+		// We are using _init() here to check for 
+		// the current logged in user and also
+		// to assign the username to a variable
+		// that we use to fetch the respective documents.
+		//
+		// If username doesn't exist (user is not logged in),
+		// we send user back to the login screen
+    try {
+      // We use mounted here to prevent state problems
+      // with navigation
+      //
+      // mounted is used for checking if
+      // the state object we are operating on
+      // is currently active in the widget tree
+      // this is helps avoid erros when performing
+      // async operations
+      username = await userRepo.getUsername();
+      if (username == null || username!.isEmpty) {
+        if (mounted) context.go('/login');
+        debugPrint("Please sign in first.");
+        return;
+      }
+			// We set _loading to be false if username
+			// is not null
+      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) {
+        context.go('/login');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _init(context);
+  }
+
+  void _onConfirm(List<bool> expenseBools, List<Expense> expenses) async {
     List<Expense> expensesToBeAdded = [];
     for (int i = 0; i < expenseBools.length; i++) {
       if (expenseBools[i]) {
@@ -45,9 +89,13 @@ class _AddExistingExpenseToCategoryDialogState
         );
         debugPrint(currentExpense.toString());
         expenseRepo.updateExpense(currentExpense);
+        if (!mounted) return;
         Navigator.of(context).pop();
       }
     } else {
+      // TODO: add a dialog for showing error?
+      if (!mounted) return;
+      Navigator.of(context).pop();
       debugPrint("expenses is empty or selected category is null");
     }
   }
@@ -82,7 +130,7 @@ class _AddExistingExpenseToCategoryDialogState
                                     context,
                                     AsyncSnapshot<List<Category>> asyncData,
                                   ) {
-                                    if (asyncData.connectionState ==
+                                    if (_loading ||asyncData.connectionState ==
                                         ConnectionState.waiting) {
                                       return const SizedBox(
                                         height: 24,
@@ -126,7 +174,7 @@ class _AddExistingExpenseToCategoryDialogState
 
                   // Example expenses stream - every branch returns a Sliver
                   StreamBuilder<List<Expense>>(
-                    stream: expenseRepo.getAllExpensesWithoutCategory(),
+                    stream: expenseRepo.getAllExpensesWithoutCategoryForCurrentUser(username!),
                     builder: (context, AsyncSnapshot<List<Expense>> asyncData) {
                       if (asyncData.connectionState ==
                           ConnectionState.waiting) {

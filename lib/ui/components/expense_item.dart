@@ -12,23 +12,123 @@ class ExpenseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: () => onClickItem(expense),
       child: Card(
-        margin: const EdgeInsets.all(10.0),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        elevation: 2,
         child: Container(
-          margin: EdgeInsets.all(10.0),
-          child: Row(
+          height: 120,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                children: [Text(expense.name), Text(expense.description ?? "")],
+              // Name and Amount
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      expense.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '\$${expense.amount.toStringAsFixed(2)}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
               ),
-              Text(expense.amount.toString()),
+              // Who Paid
+              Text(
+                'Paid by: ${expense.whopaid}',
+                style: theme.textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              // Category and Description
+              Row(
+                children: [
+                  // Category Badge
+                  if (expense.categoryName != null &&
+                      expense.categoryName!.isNotEmpty)
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getCategoryColor(expense.categoryName!),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          expense.categoryName!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  if (expense.categoryName != null &&
+                      expense.categoryName!.isNotEmpty)
+                    const SizedBox(width: 8),
+                  // Description
+                  Expanded(
+                    child: Text(
+                      expense.description ?? "",
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // Generate consistent color for category badge based on category name
+	//
+	// Essentially, we are generating a hascode for the category name, 
+	// every string has a hashcode that will never change, so this means
+	// that every distinct category name will have the same color
+	// regardless of app reload 
+	// 
+	// Then we use .abs to ensure we convert negative hash codes
+	// to be positive, also giving a number between 0 and the length of
+	// categories, ensuring we never get an index that is out of bounds
+  Color _getCategoryColor(String category) {
+    const colors = [
+      Color(0xFFEF5350),
+      Color(0xFF42A5F5),
+      Color(0xFF66BB6A),
+      Color(0xFFFFCA28),
+      Color(0xFFAB47BC),
+      Color(0xFF26C6DA),
+      Color(0xFFEC407A),
+      Color(0xFFFFB74D),
+    ];
+    final hash = category.hashCode;
+    return colors[hash.abs() % colors.length];
   }
 }

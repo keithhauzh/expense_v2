@@ -56,17 +56,36 @@ class ExpenseRepoFireImpl {
     });
   }
 
-  Stream<List<Expense>> getExpensesByCategory(String categoryName) {
+  Stream<List<Expense>> getAllExpensesWithoutCategoryForCurrentUser(
+    String currentUsername,
+  ) {
     return _collection.snapshots().map((event) {
       // TODO: potentially rework logic? check user_repo_fire_impl.dart
       return event.docs
           .map((doc) {
             return Expense.fromMap(doc.data()).copy(docId: doc.id);
           })
-          .where((expense) => expense.categoryName == categoryName)
+          .where(
+            (expense) =>
+                expense.whopaid == currentUsername &&
+                expense.categoryName == null,
+          )
           .toList();
     });
   }
+
+  // TODO: remove later, probably not needed
+  // Stream<List<Expense>> getExpensesByCategory(String categoryName) {
+  //   return _collection.snapshots().map((event) {
+  //     // TODO: potentially rework logic? check user_repo_fire_impl.dart
+  //     return event.docs
+  //         .map((doc) {
+  //           return Expense.fromMap(doc.data()).copy(docId: doc.id);
+  //         })
+  //         .where((expense) => expense.categoryName == categoryName)
+  //         .toList();
+  //   });
+  // }
 
   Future<Expense?> getExpenseById(String docId) async {
     final res = await _collection.doc(docId).get();

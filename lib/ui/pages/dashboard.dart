@@ -2,8 +2,10 @@ import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -13,16 +15,53 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final userRepo = UserRepoFireImpl();
   final categoryRepo = CategoryRepoFireImpl();
   final expensesRepo = ExpenseRepoFireImpl();
   Stream<List<Category>> categories = Stream.value([]);
   Stream<List<Expense>> expenses = Stream.value([]);
+  String? username;
+  bool _loading = true;
 
   int touchedIndex = -1;
 
   Future<void> _init() async {
+    // TODO: move this to a helper function?
+
+    // We are using _init() here to check for
+    // the current logged in user and also
+    // to assign the username to a variable
+    // that we use to fetch the respective documents.
+    //
+    // If username doesn't exist (user is not logged in),
+    // we send user back to the login screen
+    try {
+      // We use mounted here to prevent state problems
+      // with navigation
+      //
+      // mounted is used for checking if
+      // the state object we are operating on
+      // is currently active in the widget tree
+      // this is helps avoid erros when performing
+      // async operations
+      username = await userRepo.getUsername();
+      if (username == null || username!.isEmpty) {
+        if (mounted) context.go('/login');
+        debugPrint("Please sign in first.");
+        return;
+      }
+      // We set _loading to be false if username
+      // is not null
+      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) {
+        context.go('/login');
+      }
+    }
     final categoriesFromRepo = categoryRepo.getAllCategories();
-    final expensesFromRepo = expensesRepo.getAllExpenses();
+    final expensesFromRepo = expensesRepo.getAllExpensesForCurrentUser(
+      username!,
+    );
     setState(() {
       categories = categoriesFromRepo;
       expenses = expensesFromRepo;
@@ -46,7 +85,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return StreamBuilder<List<Expense>>(
                 stream: expenses,
                 builder: (context, AsyncSnapshot<List<Expense>> expenseSnapshot) {
-                  if (!expenseSnapshot.hasData || !categorySnapshot.hasData) {
+                  if (!expenseSnapshot.hasData ||
+                      !categorySnapshot.hasData ||
+                      _loading) {
                     return SizedBox(
                       height: 200,
                       child: Center(child: CircularProgressIndicator()),
@@ -125,7 +166,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             },
           ),
-        )
+        ),
       ],
     );
   }

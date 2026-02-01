@@ -23,11 +23,20 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   bool _loading = true;
 
   Future<void> _init(BuildContext context) async {
+		// TODO: move this to a helper function?
+
+		// We are using _init() here to check for 
+		// the current logged in user and also
+		// to assign the username to a variable
+		// that we use to fetch the respective documents.
+		//
+		// If username doesn't exist (user is not logged in),
+		// we send user back to the login screen
     try {
       // We use mounted here to prevent state problems
       // with navigation
       //
-      // Mounted is used for checking if
+      // mounted is used for checking if
       // the state object we are operating on
       // is currently active in the widget tree
       // this is helps avoid erros when performing
