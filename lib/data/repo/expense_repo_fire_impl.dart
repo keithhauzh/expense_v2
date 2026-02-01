@@ -60,16 +60,15 @@ class ExpenseRepoFireImpl {
     String currentUsername,
   ) {
     return _collection.snapshots().map((event) {
-      // TODO: potentially rework logic? check user_repo_fire_impl.dart
       return event.docs
           .map((doc) {
             return Expense.fromMap(doc.data()).copy(docId: doc.id);
           })
           .where(
             (expense) =>
-                expense.whopaid == currentUsername &&
-                expense.categoryName == null,
+                expense.categoryName!.isEmpty || expense.categoryName == null,
           )
+          .where((expense) => expense.whopaid == currentUsername)
           .toList();
     });
   }

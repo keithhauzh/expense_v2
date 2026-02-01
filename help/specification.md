@@ -6,7 +6,7 @@
 
 # TODOS:
 TODO: check if going back in navigation allows not signed in user to write stuff anyway. []
-TODO: disable stock splash screen and use custom instead
+TODO: disable stock splash screen and use custom instead []
 TODO: in the pie chart, for uncategorized expenses, show a section for them. []
 TODO: make sure navigator pop doesn't crash the app, check for !mounted on everything. []
 TODO: rework group view ui. []
@@ -16,7 +16,6 @@ TODO: check if all backend apis have auth verification handling. []
 TODO: show percentage of expenses according to total expense in group per group. []
 TODO: dialog for confirmation on sign out. []
 TODO: delete unused pages. []
-TODO: check all apis for duplicate groups and categories when creating (prevent duplicates). []
 
 ## Important Concepts to Remember for This Project
 
