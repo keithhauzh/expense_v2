@@ -1,7 +1,7 @@
 import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/group_item.dart';
-import 'package:expense_v2/ui/dialog/view_group_sheet.dart';
+import 'package:expense_v2/ui/dialog/view_group_dialog.dart';
 import 'package:flutter/material.dart';
 
 class GroupsScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
     debugPrint(groupName);
     showDialog(
       context: context,
-      builder: (_) => ViewGroupSheet(groupName: groupName),
+      builder: (_) => ViewGroupDialog(groupName: groupName),
     );
   }
 
@@ -59,15 +59,14 @@ class _GroupsScreenState extends State<GroupsScreen> {
                       sliver: SliverGrid.builder(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12.0,
-                          mainAxisSpacing: 12.0,
-                          childAspectRatio: 1.0,
-                        ),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12.0,
+                              mainAxisSpacing: 12.0,
+                              childAspectRatio: 1.0,
+                            ),
                         itemBuilder: (context, index) => GroupItem(
                           group: groups[index],
-                          onClickItem: (group) =>
-                              _showGroupDialog(group.name),
+                          onClickItem: (group) => _showGroupDialog(group.name),
                         ),
                         itemCount: groups.length,
                       ),

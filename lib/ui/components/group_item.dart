@@ -10,9 +10,11 @@ class GroupItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+		// expensesStream = 
+
     // TODO: make group item show total expense amount
     //  and number of accounts in the group
-
+		// StreamBuilder(stream: stream, builder: builder)
     return GestureDetector(
       onTap: () => onClickItem(group),
       child: Card(

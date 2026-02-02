@@ -13,8 +13,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final repo = UserRepoFireImpl();
 
-  String _username = "", _email = "", _password = "";
-  String? _nameError, _passError, _emailError;
+  String _email = "", _password = "";
+  String? _passError, _emailError;
 
   void _navigateToSignup() {
     context.go('/signup');
@@ -25,22 +25,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _emailError = "email cannot be empty";
       return false;
     }
-    if (_username.isEmpty) {
-      _nameError = "username cannot be empty";
-      return false;
-    }
     if (_password.isEmpty) {
       _passError = "password cannot be empty";
       return false;
     }
     return true;
-  }
-
-  void _onNameChanged(String value) {
-    setState(() {
-      _username = value;
-      _nameError = null;
-    });
   }
 
   void _onEmailChanged(String value) {
@@ -64,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go("/dashboard");
       } on FirebaseAuthException catch (e) {
         setState(() {
-          _nameError = e.toString();
+          _emailError = e.toString();
         });
       } catch (e) {
         setState(() {

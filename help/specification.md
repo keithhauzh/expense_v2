@@ -15,6 +15,7 @@ TODO: check if all backend apis have auth verification handling.
 TODO: show percentage of expenses according to total expense in group per group. 
 TODO: dialog for confirmation on sign out. 
 TODO: delete unused pages. 
+TODO: make it so in group view, users cannot scroll past the current month, meaning they cannot view future month expenses
 
 ## Important Concepts to Remember for This Project
 
