@@ -1,6 +1,7 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
+import 'package:expense_v2/ui/dialog/add_expense_date_to_group_dialog.dart';
 import 'package:flutter/material.dart';
 
 class AddExpenseDialog extends StatefulWidget {
@@ -16,10 +17,9 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
 
   String _name = "", _description = "";
   double _amount = 0.0;
+  DateTime _selectedDate = DateTime.now();
   String? _nameError, _amountError;
 
-  // TODO: instead of just using one function, perhaps i can separate it to be functions
-  //  per field, so that it follows Single Responsibility Rule (SRP)
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
     final amountError = _amount <= 0 ? "Invalid amount" : null;
@@ -59,10 +59,46 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
     });
   }
 
-  void _onCancel() {
-    Navigator.pop(context, "Cancel");
-    debugPrint("Cancelled creation");
+  void _showMonthPicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddExpenseDateToExpenseDialog(
+          selectedMonth: _selectedDate,
+          onMonthSelected: (newMonth) {
+            setState(() {
+              _selectedDate = DateTime(newMonth.year, newMonth.month, 1);
+            });
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
   }
+
+  String _formatMonth(DateTime date) {
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return '${months[date.month - 1]} ${date.year}';
+  }
+
+  // TODO: cancel button?
+  // void _onCancel() {
+  //   Navigator.pop(context, "Cancel");
+  //   debugPrint("Cancelled creation");
+  // }
 
   void _onConfirm() async {
     if (_validateFields()) {
@@ -73,6 +109,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
           amount: _amount,
           description: _description,
           whopaid: username,
+          createdAt: _selectedDate,
         );
         debugPrint(expense.toString());
         final addedExpense = await expenseRepo.addExpense(expense);
@@ -102,7 +139,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
         padding: EdgeInsets.all(5),
         child: SingleChildScrollView(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               TextField(
                 onChanged: (value) => _onNameChanged(value),
@@ -132,6 +168,30 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
                   hintText: "Enter Description",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              GestureDetector(
+                onTap: _showMonthPicker,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 12.0,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[400]!),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _formatMonth(_selectedDate),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      Icon(Icons.calendar_today, size: 20, color: Colors.blue),
+                    ],
                   ),
                 ),
               ),

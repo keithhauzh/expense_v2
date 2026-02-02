@@ -98,17 +98,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 10),
               TextField(
-                onChanged: (value) => _onNameChanged(value),
-                decoration: InputDecoration(
-                  hintText: "Enter your username",
-                  errorText: _nameError,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
                 onChanged: (value) => _onPassChanged(value),
                 decoration: InputDecoration(
                   hintText: "Enter your password",

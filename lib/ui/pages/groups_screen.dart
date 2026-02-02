@@ -16,7 +16,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
   void _showGroupDialog(String groupName) {
     debugPrint(groupName);
-    showBottomSheet(
+    showDialog(
       context: context,
       builder: (_) => ViewGroupSheet(groupName: groupName),
     );
