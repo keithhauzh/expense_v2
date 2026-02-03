@@ -112,7 +112,9 @@ class ExpenseItem extends StatelessWidget {
                   if (expense.groupName != null &&
                       expense.groupName!.isNotEmpty)
                     const SizedBox(width: 8),
-                  // Group Badge (Bottom Right)
+
+
+                  // Group badge (bottom right)
                   if (expense.groupName != null &&
                       expense.groupName!.isNotEmpty)
                     Container(
