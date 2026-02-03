@@ -9,12 +9,9 @@ class GroupItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasDescription =
+        group.description != null && group.description!.isNotEmpty;
 
-		// expensesStream = 
-
-    // TODO: make group item show total expense amount
-    //  and number of accounts in the group
-		// StreamBuilder(stream: stream, builder: builder)
     return GestureDetector(
       onTap: () => onClickItem(group),
       child: Card(
@@ -31,14 +28,13 @@ class GroupItem extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Group Name
-                Text(
+          child: Stack(
+            children: [
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 16,
+                child: Text(
                   group.name,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -47,55 +43,46 @@ class GroupItem extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Total Amount and Accounts
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '\$0.00',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+              ),
+              if (hasDescription)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0),
+                          Colors.black.withOpacity(0.6),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      group.description!,
+                      style: theme.textTheme.bodySmall?.copyWith(
                         color: Colors.white,
+                        fontWeight: FontWeight.w400,
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '0 accounts',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // Generate consistent color for category badge based on category name
-  //
-  // Essentially, we are generating a hascode for the category name,
-  // every string has a hashcode that will never change, so this means
-  // that every distinct category name will have the same color
-  // regardless of app reload
-  //
-  // Then we use .abs to ensure we convert negative hash codes
-  // to be positive, also giving a number between 0 and the length of
-  // categories, ensuring we never get an index that is out of bounds
   Color _getGroupColor(String groupName) {
     const colors = [
       Color(0xFF6366F1),

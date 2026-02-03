@@ -26,7 +26,7 @@ class ExpenseItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Name and Amount
+              // Name and amount
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -50,17 +50,21 @@ class ExpenseItem extends StatelessWidget {
                   ),
                 ],
               ),
-              // Who Paid
-              Text(
-                'Paid by: ${expense.whopaid}',
-                style: theme.textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              // Category and Description
+
+
+              // Who paid and category
               Row(
                 children: [
-                  // Category Badge
+                  Text(
+                    'Paid by: ${expense.whopaid}',
+                    style: theme.textTheme.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (expense.categoryName != null &&
+                      expense.categoryName!.isNotEmpty)
+                    const SizedBox(width: 8),
+                  // Category badge
                   if (expense.categoryName != null &&
                       expense.categoryName!.isNotEmpty)
                     Flexible(
@@ -84,9 +88,16 @@ class ExpenseItem extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (expense.categoryName != null &&
-                      expense.categoryName!.isNotEmpty)
-                    const SizedBox(width: 8),
+                ],
+              ),
+
+
+              // Description and group badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+
                   // Description
                   Expanded(
                     child: Text(
@@ -98,6 +109,39 @@ class ExpenseItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (expense.groupName != null &&
+                      expense.groupName!.isNotEmpty)
+                    const SizedBox(width: 8),
+                  // Group Badge (Bottom Right)
+                  if (expense.groupName != null &&
+                      expense.groupName!.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _getGroupColor(expense.groupName!),
+                            _getGroupColor(expense.groupName!)
+                                .withOpacity(0.7),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        expense.groupName!,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -129,6 +173,22 @@ class ExpenseItem extends StatelessWidget {
       Color(0xFFFFB74D),
     ];
     final hash = category.hashCode;
+    return colors[hash.abs() % colors.length];
+  }
+
+  // Generate consistent color for group badge based on group name (with hashcode)
+  Color _getGroupColor(String groupName) {
+    const colors = [
+      Color(0xFFFF6B6B),
+      Color(0xFF4ECDC4),
+      Color(0xFF45B7D1),
+      Color(0xFFFFA07A),
+      Color(0xFF98D8C8),
+      Color(0xFFF7DC6F),
+      Color(0xFFBB8FCE),
+      Color(0xFF85C1E2),
+    ];
+    final hash = groupName.hashCode;
     return colors[hash.abs() % colors.length];
   }
 }
