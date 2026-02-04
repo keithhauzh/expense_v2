@@ -5,6 +5,7 @@ import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/pie_chart_component.dart';
 import 'package:expense_v2/ui/components/monthly_trend_chart.dart';
+import 'package:expense_v2/ui/components/recent_groups_list.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -146,8 +147,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   // Calculate monthly totals for trend chart
                   final monthlyTotals = _aggregateMonthlyExpenses(expenseList);
+                  
+                  // Calculate recent groups
+                  final recentGroups = _aggregateRecentGroups(expenseList);
 
-                  // Return both charts in a column
+                  // Return all dashboard components in a column
                   return Column(
                     children: [
                       PieChartComponent(
@@ -155,6 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         totalExpensePerCategory: totalExpensePerCategory,
                       ),
                       MonthlyTrendChart(monthlyTotals: monthlyTotals),
+                      RecentGroupsList(groups: recentGroups),
                     ],
                   );
                 },
@@ -192,5 +197,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return monthlyTotals;
+  }
+
+  List<GroupActivity> _aggregateRecentGroups(List<Expense> expenses) {
+    // Map to store group data: groupName -> {lastDate, total, count}
+    final Map<String, Map<String, dynamic>> groupData = {};
+
+    for (var expense in expenses) {
+      // Skip expenses without a group
+      if (expense.groupName == null || expense.groupName!.isEmpty) {
+        continue;
+      }
+
+      final groupName = expense.groupName!;
+      final expenseDate = expense.effectiveCreatedAt;
+
+      if (!groupData.containsKey(groupName)) {
+        groupData[groupName] = {
+          'lastDate': expenseDate,
+          'total': 0.0,
+          'count': 0,
+        };
+      }
+
+      final data = groupData[groupName]!;
+      
+      // Update last activity date if this expense is more recent
+      if (expenseDate.isAfter(data['lastDate'] as DateTime)) {
+        data['lastDate'] = expenseDate;
+      }
+
+      // Update total and count
+      data['total'] = (data['total'] as double) + expense.amount;
+      data['count'] = (data['count'] as int) + 1;
+    }
+
+    // Convert to list of GroupActivity objects
+    final groups = groupData.entries.map((entry) {
+      final data = entry.value;
+      return GroupActivity(
+        groupName: entry.key,
+        lastActivity: data['lastDate'] as DateTime,
+        total: data['total'] as double,
+        count: data['count'] as int,
+      );
+    }).toList();
+
+    // Sort by last activity (most recent first)
+    groups.sort((a, b) => b.lastActivity.compareTo(a.lastActivity));
+
+    // Return top 5
+    return groups.take(5).toList();
   }
 }

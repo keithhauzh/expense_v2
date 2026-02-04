@@ -12,6 +12,10 @@ class UserRepoFireImpl {
 
   final _collection = FirebaseFirestore.instance.collection("users");
 
+  Stream<User?> authStateChanges() {
+    return FirebaseAuth.instance.authStateChanges();
+  }
+
   Future<UserCredential> signUp(
     String email,
     String username,

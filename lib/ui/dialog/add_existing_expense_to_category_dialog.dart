@@ -93,9 +93,9 @@ class _AddExistingExpenseToCategoryDialogState
         );
         debugPrint(currentExpense.toString());
         expenseRepo.updateExpense(currentExpense);
-        if (!mounted) return;
-        Navigator.of(context).pop();
       }
+      if (!mounted) return;
+      Navigator.of(context).pop();
     } else {
       // TODO: add a dialog for showing error?
       if (!mounted) return;

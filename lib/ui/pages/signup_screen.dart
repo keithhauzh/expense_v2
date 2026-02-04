@@ -116,6 +116,7 @@ class _SignupScreenState extends State<SignupScreen> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onPassChanged(value),
+                obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
                   errorText: _passError,

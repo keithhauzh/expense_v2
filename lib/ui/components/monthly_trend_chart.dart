@@ -25,7 +25,7 @@ class _MonthlyTrendChartState extends State<MonthlyTrendChart> {
     final sortedMonths = widget.monthlyTotals.keys.toList()..sort();
     final maxValue = widget.monthlyTotals.values.isEmpty
         ? 100.0
-        : widget.monthlyTotals.values.reduce((a, b) => a > b ? a : b);
+        : widget.monthlyTotals.values.reduce((a, b) => a > b ? a : b).clamp(1.0, double.infinity);
 
     return Card(
       margin: const EdgeInsets.all(16),

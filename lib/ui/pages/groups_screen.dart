@@ -30,66 +30,54 @@ class _GroupsScreenState extends State<GroupsScreen> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(
-          child: CustomScrollView(
-            slivers: [
-              StreamBuilder(
-                stream: repo.getAllGroups(),
-                builder: (context, AsyncSnapshot<List<Group>> asyncData) {
-                  if (asyncData.connectionState == ConnectionState.waiting) {
+        CustomScrollView(
+          slivers: [
+            StreamBuilder(
+              stream: repo.getAllGroups(),
+              builder: (context, AsyncSnapshot<List<Group>> asyncData) {
+                if (asyncData.connectionState == ConnectionState.waiting) {
+                  return const SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (asyncData.hasData) {
+                  final groups = asyncData.data ?? [];
+
+                  if (groups.isEmpty) {
                     return const SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  } else if (asyncData.hasData) {
-                    final groups = asyncData.data ?? [];
-
-                    if (groups.isEmpty) {
-                      return const SliverToBoxAdapter(
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Text('No Groups Found'),
-                          ),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Text('No Groups Found'),
                         ),
-                      );
-                    }
-
-                    return SliverPadding(
-                      padding: const EdgeInsets.all(12.0),
-                      sliver: SliverGrid.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 12.0,
-                              mainAxisSpacing: 12.0,
-                              childAspectRatio: 1.0,
-                            ),
-                        itemBuilder: (context, index) => GroupItem(
-                          group: groups[index],
-                          onClickItem: (group) => _showGroupDialog(group.name),
-                        ),
-                        itemCount: groups.length,
                       ),
                     );
-                  } else {
-                    return SliverToBoxAdapter(
-                      child: Center(child: Text(asyncData.error.toString())),
-                    );
                   }
-                },
-              ),
-            ],
-          ),
-        ),
 
-        Positioned(
-          left: 16.0,
-          bottom: 16.0,
-          child: FloatingActionButton.extended(
-            label: Text("Sort"),
-            onPressed: _triggerSort,
-            icon: Icon(Icons.sort),
-          ),
+                  return SliverPadding(
+                    padding: const EdgeInsets.all(12.0),
+                    sliver: SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12.0,
+                            mainAxisSpacing: 12.0,
+                            childAspectRatio: 1.0,
+                          ),
+                      itemBuilder: (context, index) => GroupItem(
+                        group: groups[index],
+                        onClickItem: (group) => _showGroupDialog(group.name),
+                      ),
+                      itemCount: groups.length,
+                    ),
+                  );
+                } else {
+                  return SliverToBoxAdapter(
+                    child: Center(child: Text(asyncData.error.toString())),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ],
     );

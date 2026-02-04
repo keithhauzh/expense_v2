@@ -1,7 +1,5 @@
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
-import 'package:expense_v2/ui/dialog/add_category_dialog.dart';
-import 'package:expense_v2/ui/dialog/add_existing_expense_to_category_dialog.dart';
-import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
+import 'package:expense_v2/ui/dialog/add_bottom_sheet.dart';
 import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
 import 'package:expense_v2/ui/dialog/logout_confirmation_dialog.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
@@ -19,17 +17,41 @@ class Navigation {
   final GlobalKey<NavigatorState> rootNavigatorKey;
   final GlobalKey<NavigatorState> shellNavigatorKey;
   late final GoRouter router;
+  final ValueNotifier<String?> usernameNotifier = ValueNotifier<String?>(null);
 
   Navigation()
     : rootNavigatorKey = GlobalKey<NavigatorState>(),
       shellNavigatorKey = GlobalKey<NavigatorState>() {
     router = _createRouter();
+    _setupAuthListener();
+  }
+
+  void _setupAuthListener() {
+    // Listen to auth state changes
+    userRepo.authStateChanges().listen((user) async {
+      if (user != null) {
+        // User is logged in, load username
+        await _loadUsername();
+      } else {
+        // User is logged out
+        usernameNotifier.value = null;
+      }
+    });
+  }
+
+  Future<void> _loadUsername() async {
+    try {
+      usernameNotifier.value = await userRepo.getUsername();
+    } catch (_) {
+      usernameNotifier.value = null;
+    }
   }
 
   GoRouter _createRouter() {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: '/splash',
+      refreshListenable: usernameNotifier,
       routes: [
         GoRoute(
           path: '/splash',
@@ -55,6 +77,14 @@ class Navigation {
                 appBar: AppBar(
                   title: Text('Dashboard'),
                   actions: [
+                    ValueListenableBuilder<String?>(
+                      valueListenable: usernameNotifier,
+                      builder: (context, name, _) {
+                        if (name == null || name.isEmpty)
+                          return SizedBox.shrink();
+                        return Text(name);
+                      },
+                    ),
                     IconButton(
                       onPressed: () {
                         showDialog(
@@ -100,6 +130,9 @@ class Navigation {
                     // widgets above it, (in this case, DefaultTabController) that a previously
                     // captured context couldn't.
                     builder: (innerContext) => FloatingActionButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(60),
+                      ),
                       child: Icon(Icons.add),
                       onPressed: () {
                         final currentIndex = DefaultTabController.of(
@@ -109,50 +142,8 @@ class Navigation {
                           case 0:
                             showModalBottomSheet(
                               context: innerContext,
-                              builder: (bottomSheetContext) {
-                                return Padding(
-                                  padding: const EdgeInsetsGeometry.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      FilledButton(
-                                        onPressed: () {
-                                          Navigator.pop(bottomSheetContext);
-                                          showDialog(
-                                            context: innerContext,
-                                            builder: (_) => AddExpenseDialog(),
-                                          );
-                                        },
-                                        child: Text("Add Expense"),
-                                      ),
-                                      SizedBox(height: 8),
-                                      FilledButton(
-                                        onPressed: () {
-                                          Navigator.pop(bottomSheetContext);
-                                          showDialog(
-                                            context: innerContext,
-                                            builder: (_) => AddCategoryDialog(),
-                                          );
-                                        },
-                                        child: Text("Add Category"),
-                                      ),
-                                      SizedBox(height: 8),
-                                      FilledButton(
-                                        onPressed: () {
-                                          Navigator.pop(bottomSheetContext);
-                                          showDialog(
-                                            context: innerContext,
-                                            builder: (_) =>
-                                                AddExistingExpenseToCategoryDialog(),
-                                          );
-                                        },
-                                        child: Text(
-                                          "Add an existing expense to a category",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                              builder: (_) {
+                                return AddBottomSheet();
                               },
                             );
                             break;
@@ -169,6 +160,14 @@ class Navigation {
                   appBar: AppBar(
                     title: Text('Expenses'),
                     actions: [
+                      ValueListenableBuilder<String?>(
+                        valueListenable: usernameNotifier,
+                        builder: (context, name, _) {
+                          if (name == null || name.isEmpty)
+                            return SizedBox.shrink();
+                          return Text(name);
+                        },
+                      ),
                       IconButton(
                         onPressed: () {
                           showDialog(
@@ -181,7 +180,10 @@ class Navigation {
                     ],
                     bottom: TabBar(
                       tabs: <Widget>[
-                        Tab(text: 'Expenses', icon: Icon(Icons.money)),
+                        Tab(
+                          text: 'Personal Expenses',
+                          icon: Icon(Icons.person),
+                        ),
                         Tab(text: 'Groups', icon: Icon(Icons.group)),
                       ],
                     ),

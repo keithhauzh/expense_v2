@@ -21,6 +21,7 @@ TODO: show which account is signed in, also add a mini profile page that shows
 TODO: change rules on firebase to be read and write only for authenticated users
 TODO: add a totalExpense field to efficiently display totalExpenses for each group 
 TODO: montly view in dashboard
+TODO: add null checking for navigation (for username, if null, navigate back to login)
 
 ## Important Concepts to Remember for This Project
 

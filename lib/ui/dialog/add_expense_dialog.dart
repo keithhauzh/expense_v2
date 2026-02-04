@@ -164,6 +164,8 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onDescChanged(value),
+                minLines: 3,
+                maxLines: null,
                 decoration: InputDecoration(
                   hintText: "Enter Description",
                   border: OutlineInputBorder(

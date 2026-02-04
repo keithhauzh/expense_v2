@@ -66,9 +66,11 @@ class _AddExpenseDateToExpenseDialogState
       title: Text('Select Month'),
       content: SizedBox(
         width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        height: 350,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Year Selector
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,7 +94,7 @@ class _AddExpenseDateToExpenseDialogState
             const SizedBox(height: 16),
             // Month Grid
             SizedBox(
-              height: 200,
+              height: 280,
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -149,6 +151,7 @@ class _AddExpenseDateToExpenseDialogState
               ),
             ),
           ],
+        ),
         ),
       ),
       actions: [

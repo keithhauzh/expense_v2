@@ -21,7 +21,12 @@ class ViewExpenseDialog extends StatelessWidget {
         ),
       ),
       content: SingleChildScrollView(
-        child: Column(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: 400,
+            maxWidth: 500,
+          ),
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -41,7 +46,7 @@ class ViewExpenseDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Amount',
-                    style: theme.textTheme.labelMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -49,7 +54,7 @@ class ViewExpenseDialog extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     '\$${expense.amount.toStringAsFixed(2)}',
-                    style: theme.textTheme.displaySmall?.copyWith(
+                    style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
                     ),
@@ -75,7 +80,7 @@ class ViewExpenseDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Group',
-                    style: theme.textTheme.labelMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -136,7 +141,7 @@ class ViewExpenseDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Category',
-                    style: theme.textTheme.labelMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -198,7 +203,7 @@ class ViewExpenseDialog extends StatelessWidget {
                 children: [
                   Text(
                     'Description',
-                    style: theme.textTheme.labelMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
@@ -216,12 +221,13 @@ class ViewExpenseDialog extends StatelessWidget {
                     ),
                     child: Text(
                       expense.description!,
-                      style: theme.textTheme.bodyMedium,
+                      style: theme.textTheme.bodyLarge,
                     ),
                   ),
                 ],
               ),
           ],
+        ),
         ),
       ),
       actions: [
@@ -253,7 +259,7 @@ class ViewExpenseDialog extends StatelessWidget {
           children: [
             Text(
               label,
-              style: theme.textTheme.labelMedium?.copyWith(
+              style: theme.textTheme.labelLarge?.copyWith(
                 color: Colors.grey[600],
                 fontWeight: FontWeight.w500,
               ),
@@ -261,7 +267,7 @@ class ViewExpenseDialog extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               value,
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
             ),

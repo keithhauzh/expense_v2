@@ -87,6 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 10),
               TextField(
+                obscureText: true,
                 onChanged: (value) => _onPassChanged(value),
                 decoration: InputDecoration(
                   hintText: "Enter your password",

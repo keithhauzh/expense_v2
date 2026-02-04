@@ -25,10 +25,19 @@ class _PieChartComponentState extends State<PieChartComponent> {
       child: Row(
         children: [
           const SizedBox(width: 28),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildIndicators(widget.nonZeroExpenses),
+          Expanded(
+            child: CustomScrollView(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              slivers: [
+                // Convert your column items to sliver items
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    _buildIndicators(widget.nonZeroExpenses),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 18),
           Expanded(

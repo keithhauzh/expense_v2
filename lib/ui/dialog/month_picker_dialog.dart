@@ -64,9 +64,11 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
       title: Text('Select Month'),
       content: SizedBox(
         width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        height: 350,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Year Selector
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,7 +92,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
             const SizedBox(height: 16),
             // Month Grid
             SizedBox(
-              height: 200,
+              height: 280,
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -103,8 +105,6 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
                 itemCount: 12,
                 itemBuilder: (context, index) {
                   final monthNum = index + 1;
-                  final isCurrentMonth =
-                      selectedYear == now.year && monthNum <= now.month;
                   final isFutureMonth =
                       selectedYear > now.year ||
                       (selectedYear == now.year && monthNum > now.month);
@@ -149,6 +149,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
               ),
             ),
           ],
+        ),
         ),
       ),
       actions: [
@@ -206,17 +207,11 @@ class MonthSelectorDelegate extends SliverPersistentHeaderDelegate {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'Expenses',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(height: 2),
                 Text(
-                  'Total: \$${totalExpenses.toStringAsFixed(2)}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  'Total this month: \$${totalExpenses.toStringAsFixed(2)}',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
                     color: Colors.green,
                   ),
                 ),
@@ -237,11 +232,11 @@ class MonthSelectorDelegate extends SliverPersistentHeaderDelegate {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.calendar_today, size: 14, color: Colors.blue),
+                    Icon(Icons.calendar_today, size: 18, color: Colors.blue),
                     const SizedBox(width: 6),
                     Text(
                       '${months[selectedMonth.month - 1]} ${selectedMonth.year}',
-                      style: theme.textTheme.labelSmall?.copyWith(
+                      style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.blue,
                         fontWeight: FontWeight.w500,
                       ),
