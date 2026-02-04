@@ -12,7 +12,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final repo = UserRepoFireImpl();
-  String _email = "", _username = "", _password = "";
+  String _email = "", _username = "", _password = "", _password2 = "";
   String? _emailError, _nameError, _passError;
 
   void _navigateToLogin() {
@@ -21,15 +21,27 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool _validateFields() {
     if (_email.isEmpty) {
-      _emailError = "email cannot be empty";
+      setState(() {
+        _emailError = "email cannot be empty";
+      });
       return false;
     }
     if (_username.isEmpty) {
-      _nameError = "username cannot be empty";
+      setState(() {
+        _nameError = "username cannot be empty";
+      });
       return false;
     }
     if (_password.isEmpty) {
-      _passError = "password cannot be empty";
+      setState(() {
+        _passError = "password cannot be empty";
+      });
+      return false;
+    }
+    if (_password2.trim() != _password.trim()) {
+      setState(() {
+        _passError = "both password fields must contain the same value";
+      });
       return false;
     }
     return true;
@@ -52,6 +64,13 @@ class _SignupScreenState extends State<SignupScreen> {
   void _onPassChanged(String value) {
     setState(() {
       _password = value;
+      _passError = null;
+    });
+  }
+
+  void _onPass2Changed(String value) {
+    setState(() {
+      _password2 = value;
       _passError = null;
     });
   }
@@ -123,6 +142,19 @@ class _SignupScreenState extends State<SignupScreen> {
                 maxLength: 50,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
+                  errorText: _passError,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                onChanged: (value) => _onPass2Changed(value),
+                obscureText: true,
+                maxLength: 50,
+                decoration: InputDecoration(
+                  hintText: "Enter your password again to confirm :)",
                   errorText: _passError,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
