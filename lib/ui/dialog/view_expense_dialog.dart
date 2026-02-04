@@ -1,21 +1,56 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/dialog/delete_confirmation_dialog.dart';
 import 'package:expense_v2/ui/dialog/edit_expense_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ViewExpenseDialog extends StatelessWidget {
+class ViewExpenseDialog extends StatefulWidget {
   const ViewExpenseDialog({
     required this.expense,
     super.key
   });
 
   final Expense expense;
+
+  @override
+  State<ViewExpenseDialog> createState() => _ViewExpenseDialogState();
+}
+
+class _ViewExpenseDialogState extends State<ViewExpenseDialog> {
+  String? _currentUsername;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUsername();
+  }
+
+  Future<void> _loadCurrentUsername() async {
+    try {
+      final userRepo = UserRepoFireImpl();
+      final username = await userRepo.getUsername();
+      setState(() {
+        _currentUsername = username;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  bool get _isOwner {
+    return _currentUsername != null && _currentUsername == widget.expense.whopaid;
+  }
   
   Future<void> _editExpense(BuildContext context) async {
     final result = await showDialog(
       context: context,
-      builder: (context) => EditExpenseDialog(expense: expense),
+      builder: (context) => EditExpenseDialog(expense: widget.expense),
     );
     
     if (result == 'OK' && context.mounted) {
@@ -30,9 +65,9 @@ class ViewExpenseDialog extends StatelessWidget {
       builder: (context) => const DeleteConfirmationDialog(),
     );
     
-    if (confirmed == true && expense.docId != null) {
+    if (confirmed == true && widget.expense.docId != null) {
       try {
-        await repo.deleteExpense(expense.docId!);
+        await repo.deleteExpense(widget.expense.docId!);
         if (context.mounted) {
           Navigator.of(context).pop('deleted');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -58,22 +93,24 @@ class ViewExpenseDialog extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              expense.name,
+              widget.expense.name,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.blue),
-            onPressed: () => _editExpense(context),
-            tooltip: 'Edit expense',
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () => _deleteExpense(context),
-            tooltip: 'Delete expense',
-          ),
+          if (!_isLoading && _isOwner) ...[
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => _editExpense(context),
+              tooltip: 'Edit expense',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _deleteExpense(context),
+              tooltip: 'Delete expense',
+            ),
+          ],
         ],
       ),
       content: SingleChildScrollView(
@@ -108,7 +145,7 @@ class ViewExpenseDialog extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '\$${expense.amount.toStringAsFixed(2)}',
+                    '\$${widget.expense.amount.toStringAsFixed(2)}',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -123,13 +160,13 @@ class ViewExpenseDialog extends StatelessWidget {
             _buildDetailRow(
               context,
               'Paid by',
-              expense.whopaid,
+              widget.expense.whopaid,
               Icons.person,
             ),
             const SizedBox(height: 16),
 
             // Group
-            if (expense.groupName?.isNotEmpty ?? false)
+            if (widget.expense.groupName?.isNotEmpty ?? false)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -149,8 +186,8 @@ class ViewExpenseDialog extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          _getGroupColor(expense.groupName!),
-                          _getGroupColor(expense.groupName!)
+                          _getGroupColor(widget.expense.groupName!),
+                          _getGroupColor(widget.expense.groupName!)
                               .withOpacity(0.7),
                         ],
                         begin: Alignment.topLeft,
@@ -159,7 +196,7 @@ class ViewExpenseDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: _getGroupColor(expense.groupName!)
+                          color: _getGroupColor(widget.expense.groupName!)
                               .withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
@@ -176,7 +213,7 @@ class ViewExpenseDialog extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          expense.groupName!,
+                          widget.expense.groupName!,
                           style: theme.textTheme.labelLarge?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -190,7 +227,7 @@ class ViewExpenseDialog extends StatelessWidget {
               ),
               
             // Category
-            if (expense.categoryName?.isNotEmpty ?? false)
+            if (widget.expense.categoryName?.isNotEmpty ?? false)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -210,8 +247,8 @@ class ViewExpenseDialog extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          _getCategoryColor(expense.categoryName!),
-                          _getCategoryColor(expense.categoryName!)
+                          _getCategoryColor(widget.expense.categoryName!),
+                          _getCategoryColor(widget.expense.categoryName!)
                               .withOpacity(0.8),
                         ],
                         begin: Alignment.topLeft,
@@ -220,7 +257,7 @@ class ViewExpenseDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: _getCategoryColor(expense.categoryName!)
+                          color: _getCategoryColor(widget.expense.categoryName!)
                               .withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
@@ -237,7 +274,7 @@ class ViewExpenseDialog extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          expense.categoryName!,
+                          widget.expense.categoryName!,
                           style: theme.textTheme.labelLarge?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -251,8 +288,8 @@ class ViewExpenseDialog extends StatelessWidget {
               ),
 
             // Description
-            if (expense.description != null &&
-                expense.description!.isNotEmpty)
+            if (widget.expense.description != null &&
+                widget.expense.description!.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -275,7 +312,7 @@ class ViewExpenseDialog extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      expense.description!,
+                      widget.expense.description!,
                       style: theme.textTheme.bodyLarge,
                     ),
                   ),
