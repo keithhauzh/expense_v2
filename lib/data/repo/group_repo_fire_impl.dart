@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/model/group.dart';
 import 'package:flutter/widgets.dart';
 
@@ -60,5 +59,26 @@ class GroupRepoFireImpl {
 
   Future<void> deleteGroup(String docId) async {
     await _collection.doc(docId).delete();
+  }
+
+  Future<void> deleteGroupWithExpenses(String groupName) async {
+    final groupQuery = await _collection
+        .where('name', isEqualTo: groupName)
+        .limit(1)
+        .get();
+    if (groupQuery.docs.isEmpty) {
+      throw Exception('Group not found');
+    }
+    final groupDoc = groupQuery.docs.first;
+    final expensesCollection = FirebaseFirestore.instance.collection("expenses");
+    final expensesInGroup = await expensesCollection
+        .where('groupName', isEqualTo: groupName)
+        .get();
+    final batch = FirebaseFirestore.instance.batch();
+    for (final doc in expensesInGroup.docs) {
+      batch.delete(doc.reference);
+    }
+    batch.delete(groupDoc.reference);
+    await batch.commit();
   }
 }

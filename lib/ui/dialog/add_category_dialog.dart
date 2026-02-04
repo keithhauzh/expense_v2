@@ -59,6 +59,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             children: [
               TextField(
                 onChanged: (value) => _onNameChanged(value),
+                maxLength: 100,
                 decoration: InputDecoration(
                   hintText: "Enter Name",
                   errorText: _nameError,

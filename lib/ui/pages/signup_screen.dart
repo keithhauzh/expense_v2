@@ -62,13 +62,13 @@ class _SignupScreenState extends State<SignupScreen> {
         await repo.signUp(_email, _username, _password);
         context.go('/dashboard');
       } on FirebaseAuthException catch (e) {
-        setState(() {
-          _passError = e.toString();
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
+        );
       } on Exception catch (e) {
-				// This catch should be showing that username
-				// already exists if user tries to use a prexisting
-				// username
+        // This catch should be showing that username
+        // already exists if user tries to use a prexisting
+        // username
         setState(() {
           _passError = e.toString();
         });
@@ -94,6 +94,8 @@ class _SignupScreenState extends State<SignupScreen> {
             children: [
               TextField(
                 onChanged: (value) => _onEmailChanged(value),
+                maxLength: 100,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   errorText: _emailError,
@@ -105,6 +107,7 @@ class _SignupScreenState extends State<SignupScreen> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onNameChanged(value),
+                maxLength: 30,
                 decoration: InputDecoration(
                   hintText: "Enter your username",
                   errorText: _nameError,
@@ -117,6 +120,7 @@ class _SignupScreenState extends State<SignupScreen> {
               TextField(
                 onChanged: (value) => _onPassChanged(value),
                 obscureText: true,
+                maxLength: 50,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
                   errorText: _passError,

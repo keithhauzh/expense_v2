@@ -1,24 +1,49 @@
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
-import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/dialog/add_expense_date_to_group_dialog.dart';
 import 'package:flutter/material.dart';
 
-class AddExpenseDialog extends StatefulWidget {
-  const AddExpenseDialog({super.key});
+class EditExpenseDialog extends StatefulWidget {
+  final Expense expense;
+  
+  const EditExpenseDialog({super.key, required this.expense});
 
   @override
-  State<AddExpenseDialog> createState() => _AddExpenseDialogState();
+  State<EditExpenseDialog> createState() => _EditExpenseDialogState();
 }
 
-class _AddExpenseDialogState extends State<AddExpenseDialog> {
-  final userRepo = UserRepoFireImpl();
+class _EditExpenseDialogState extends State<EditExpenseDialog> {
   final expenseRepo = ExpenseRepoFireImpl();
 
-  String _name = "", _description = "";
-  double _amount = 0.0;
-  DateTime _selectedDate = DateTime.now();
+  late String _name, _description;
+  late double _amount;
+  late DateTime _selectedDate;
   String? _nameError, _amountError;
+  
+  late TextEditingController _nameController;
+  late TextEditingController _amountController;
+  late TextEditingController _descController;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = widget.expense.name;
+    _description = widget.expense.description ?? '';
+    _amount = widget.expense.amount;
+    _selectedDate = widget.expense.effectiveCreatedAt;
+    
+    _nameController = TextEditingController(text: _name);
+    _amountController = TextEditingController(text: _amount.toString());
+    _descController = TextEditingController(text: _description);
+  }
+  
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _amountController.dispose();
+    _descController.dispose();
+    super.dispose();
+  }
 
   bool _validateFields() {
     final nameError = _name.isEmpty ? "Name cannot be empty" : null;
@@ -27,7 +52,6 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
       _nameError = nameError;
       _amountError = amountError;
     });
-    // Error assignments happen before function exits
     if (_name.isEmpty || _amount <= 0.0) {
       return false;
     }
@@ -94,38 +118,24 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
     return '${months[date.month - 1]} ${date.year}';
   }
 
-  // TODO: cancel button?
-  // void _onCancel() {
-  //   Navigator.pop(context, "Cancel");
-  //   debugPrint("Cancelled creation");
-  // }
-
   void _onConfirm() async {
     if (_validateFields()) {
       try {
-        final username = await userRepo.getUsername();
-        final expense = Expense(
+        final updatedExpense = widget.expense.copy(
           name: _name,
           amount: _amount,
           description: _description,
-          whopaid: username,
           createdAt: _selectedDate,
         );
-        debugPrint(expense.toString());
-        final addedExpense = await expenseRepo.addExpense(expense);
-        if (addedExpense) {
-          if (!mounted) return;
-          Navigator.pop(context, 'OK');
-        } else {
-          _nameError = "expense name is already taken";
-        }
-      } on Exception catch (e) {
+        await expenseRepo.updateExpense(updatedExpense);
+        if (!mounted) return;
+        Navigator.pop(context, 'OK');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Expense updated successfully')),
+        );
+      } catch (e) {
         setState(() {
-          _nameError = e.toString();
-        });
-      } catch (_) {
-        setState(() {
-          _nameError = "Failed to add expense.";
+          _nameError = "Failed to update expense: $e";
         });
       }
     }
@@ -134,7 +144,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Add Expense"),
+      title: const Text("Edit Expense"),
       content: Padding(
         padding: EdgeInsets.all(5),
         child: SingleChildScrollView(
@@ -142,6 +152,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
             children: [
               TextField(
                 onChanged: (value) => _onNameChanged(value),
+                controller: _nameController,
                 maxLength: 100,
                 decoration: InputDecoration(
                   hintText: "Enter Name",
@@ -154,6 +165,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onAmountChanged(value),
+                controller: _amountController,
                 maxLength: 15,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
@@ -167,6 +179,7 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onDescChanged(value),
+                controller: _descController,
                 minLines: 3,
                 maxLines: null,
                 maxLength: 500,

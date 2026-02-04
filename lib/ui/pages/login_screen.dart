@@ -52,9 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await repo.login(_email, _password);
         context.go("/dashboard");
       } on FirebaseAuthException catch (e) {
-        setState(() {
-          _emailError = e.toString();
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
+        );
       } catch (e) {
         setState(() {
           _passError = "Login failed, please try again";
@@ -77,6 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               TextField(
                 onChanged: (value) => _onEmailChanged(value),
+                maxLength: 100,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   errorText: _emailError,
@@ -89,6 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 obscureText: true,
                 onChanged: (value) => _onPassChanged(value),
+                maxLength: 50,
                 decoration: InputDecoration(
                   hintText: "Enter your password",
                   errorText: _passError,

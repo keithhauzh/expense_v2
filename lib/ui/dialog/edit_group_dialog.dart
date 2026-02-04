@@ -2,34 +2,37 @@ import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:flutter/material.dart';
 
-class AddGroupDialog extends StatefulWidget {
-  const AddGroupDialog({super.key});
+class EditGroupDialog extends StatefulWidget {
+  final Group group;
+  
+  const EditGroupDialog({super.key, required this.group});
 
   @override
-  State<AddGroupDialog> createState() => _AddGroupDialogState();
+  State<EditGroupDialog> createState() => _EditGroupDialogState();
 }
 
-class _AddGroupDialogState extends State<AddGroupDialog> {
+class _EditGroupDialogState extends State<EditGroupDialog> {
   final repo = GroupRepoFireImpl();
 
-  String _name = "", _description = "";
-  String? _nameError, _descError;
+  late String _description;
+  String? _descError;
+  
+  late TextEditingController _nameController;
+  late TextEditingController _descController;
 
-  bool _validateFields() {
-    if (_name.isEmpty) {
-      setState(() {
-        _nameError = "Name cannot be empty";
-      });
-      return false;
-    }
-    return true;
+  @override
+  void initState() {
+    super.initState();
+    _description = widget.group.description ?? '';
+    _nameController = TextEditingController(text: widget.group.name);
+    _descController = TextEditingController(text: _description);
   }
-
-  void _onNameChanged(String value) {
-    setState(() {
-      _name = value;
-      _nameError = null;
-    });
+  
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descController.dispose();
+    super.dispose();
   }
 
   void _onDescChanged(String value) {
@@ -39,50 +42,47 @@ class _AddGroupDialogState extends State<AddGroupDialog> {
     });
   }
 
-  void _onCancel() {
-    Navigator.pop(context, "Cancel");
-    debugPrint("Cancelled creation");
-  }
-
   void _onConfirm() async {
-    if (_validateFields()) {
-      final group = Group(name: _name, description: _description);
-      final addedGroup = await repo.addGroup(group);
-      if (addedGroup) {
-        if (!mounted) return;
-        Navigator.pop(context, 'OK');
-      } else {
-        setState(() {
-          _nameError = "group name is already taken";
-        });
-      }
+    try {
+      final updatedGroup = widget.group.copy(description: _description);
+      await repo.updateGroup(updatedGroup);
+      if (!mounted) return;
+      Navigator.pop(context, 'OK');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Group updated successfully')),
+      );
+    } catch (e) {
+      setState(() {
+        _descError = "Failed to update group: $e";
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Add New Group"),
+      title: const Text("Edit Group"),
       content: Padding(
         padding: EdgeInsets.all(5),
         child: SingleChildScrollView(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               TextField(
-                onChanged: (value) => _onNameChanged(value),
-                maxLength: 100,
+                enabled: false,
+                controller: _nameController,
                 decoration: InputDecoration(
-                  hintText: "Enter Name",
-                  errorText: _nameError,
+                  labelText: "Name (cannot be changed)",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
+                  filled: true,
+                  fillColor: Colors.grey[200],
                 ),
               ),
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onDescChanged(value),
+                controller: _descController,
                 minLines: 3,
                 maxLines: null,
                 maxLength: 500,

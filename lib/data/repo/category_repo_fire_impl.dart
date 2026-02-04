@@ -51,5 +51,18 @@ class CategoryRepoFireImpl {
     await _collection.doc(docId).delete();
   }
 
+  Future<void> deleteCategoryAndUpdateExpenses(String docId, String categoryName) async {
+    final expensesCollection = FirebaseFirestore.instance.collection("expenses");
+    final expensesWithCategory = await expensesCollection
+        .where('categoryName', isEqualTo: categoryName)
+        .get();
+    final batch = FirebaseFirestore.instance.batch();
+    for (final doc in expensesWithCategory.docs) {
+      batch.update(doc.reference, {'categoryName': null});
+    }
+    batch.delete(_collection.doc(docId));
+    await batch.commit();
+  }
+
   // TODO: add another function for calculating total Expenses and displaying?
 }

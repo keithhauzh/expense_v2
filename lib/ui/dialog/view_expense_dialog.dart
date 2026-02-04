@@ -1,4 +1,7 @@
 import 'package:expense_v2/data/model/expense.dart';
+import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
+import 'package:expense_v2/ui/dialog/delete_confirmation_dialog.dart';
+import 'package:expense_v2/ui/dialog/edit_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ViewExpenseDialog extends StatelessWidget {
@@ -8,17 +11,70 @@ class ViewExpenseDialog extends StatelessWidget {
   });
 
   final Expense expense;
+  
+  Future<void> _editExpense(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (context) => EditExpenseDialog(expense: expense),
+    );
+    
+    if (result == 'OK' && context.mounted) {
+      Navigator.of(context).pop('edited');
+    }
+  }
+  
+  Future<void> _deleteExpense(BuildContext context) async {
+    final repo = ExpenseRepoFireImpl();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => const DeleteConfirmationDialog(),
+    );
+    
+    if (confirmed == true && expense.docId != null) {
+      try {
+        await repo.deleteExpense(expense.docId!);
+        if (context.mounted) {
+          Navigator.of(context).pop('deleted');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Expense deleted successfully')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete expense: $e')),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: Text(
-        expense.name,
-        style: theme.textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              expense.name,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            onPressed: () => _editExpense(context),
+            tooltip: 'Edit expense',
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _deleteExpense(context),
+            tooltip: 'Delete expense',
+          ),
+        ],
       ),
       content: SingleChildScrollView(
         child: ConstrainedBox(
@@ -30,7 +86,6 @@ class ViewExpenseDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Amount - Prominent Display
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16.0),

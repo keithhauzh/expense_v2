@@ -145,6 +145,7 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
             children: [
               TextField(
                 onChanged: (value) => _onNameChanged(value),
+                maxLength: 100,
                 decoration: InputDecoration(
                   hintText: "Enter Name",
                   errorText: _nameError,
@@ -156,6 +157,8 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
               SizedBox(height: 10),
               TextField(
                 onChanged: (value) => _onAmountChanged(value),
+                maxLength: 15,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
                   hintText: "Enter Amount",
                   errorText: _amountError,
@@ -169,6 +172,7 @@ class _AddExpenseToGroupState extends State<AddExpenseToGroupDialog> {
                 onChanged: (value) => _onDescChanged(value),
                 minLines: 3,
                 maxLines: null,
+                maxLength: 500,
                 decoration: InputDecoration(
                   hintText: "Enter Description",
                   border: OutlineInputBorder(

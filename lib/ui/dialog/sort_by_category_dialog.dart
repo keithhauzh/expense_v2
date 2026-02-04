@@ -1,5 +1,6 @@
 import 'package:expense_v2/data/model/category.dart';
 import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
+import 'package:expense_v2/ui/dialog/delete_confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 
 class SortByCategoryDialog extends StatefulWidget {
@@ -29,6 +30,33 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
         .map((e) => e.key)
         .toList();
     Navigator.of(context).pop(categoriesToBeSortedBy);
+  }
+
+  Future<void> _deleteCategory(String docId, String categoryName) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => const DeleteConfirmationDialog(),
+    );
+    
+    if (confirmed == true) {
+      try {
+        await repo.deleteCategoryAndUpdateExpenses(docId, categoryName);
+        if (mounted) {
+          setState(() {
+            selectedByName.remove(categoryName);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Category "$categoryName" deleted and expenses updated')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete category: $e')),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -79,21 +107,30 @@ class _SortByCategoryDialogState extends State<SortByCategoryDialog> {
                               delegate: SliverChildBuilderDelegate(
                                 childCount: categories.length,
                                 (context, index) {
+                                  final category = categories[index];
                                   final isLast = index == categories.length - 1;
                                   return Column(
                                     children: [
                                       CheckboxListTile(
-                                        value:
-                                            selectedByName[categories[index]
-                                                .name],
+                                        value: selectedByName[category.name],
                                         onChanged: (bool? value) {
                                           setState(() {
-                                            selectedByName[categories[index]
-                                                    .name] =
-                                                value!;
+                                            selectedByName[category.name] = value!;
                                           });
                                         },
-                                        title: Text(categories[index].name),
+                                        title: Text(category.name),
+                                        secondary: IconButton(
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                            size: 20,
+                                          ),
+                                          onPressed: () => _deleteCategory(
+                                            category.docId!,
+                                            category.name,
+                                          ),
+                                          tooltip: 'Delete category',
+                                        ),
                                       ),
                                       if (!isLast) const Divider(height: 1),
                                     ],

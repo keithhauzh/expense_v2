@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_v2/data/model/expense.dart';
 import 'package:expense_v2/data/model/group.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/group_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/expense_item.dart';
 import 'package:expense_v2/ui/dialog/add_expense_to_group_dialog.dart';
+import 'package:expense_v2/ui/dialog/delete_confirmation_dialog.dart';
+import 'package:expense_v2/ui/dialog/edit_group_dialog.dart';
 import 'package:expense_v2/ui/dialog/view_expense_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -67,6 +70,67 @@ class _ViewGroupDialogState extends State<ViewGroupDialog> {
         return ViewExpenseDialog(expense: expense);
       },
     );
+  }
+
+  Future<void> _editGroup(BuildContext context) async {
+    Group? group = groupData;
+    if (group == null) {
+      final groupQuery = await FirebaseFirestore.instance
+          .collection("groups")
+          .where('name', isEqualTo: widget.groupName)
+          .limit(1)
+          .get();
+
+      if (groupQuery.docs.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Group not found')));
+        }
+        return;
+      }
+
+      group = Group.fromMap(
+        groupQuery.docs.first.data(),
+      ).copy(docId: groupQuery.docs.first.id);
+    }
+
+    final result = await showDialog(
+      context: context,
+      builder: (context) => EditGroupDialog(group: group!),
+    );
+
+    if (result == 'OK') {
+      _init();
+    }
+  }
+
+  Future<void> _deleteGroup(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => const DeleteConfirmationDialog(),
+    );
+
+    if (confirmed == true) {
+      final groupNameToDelete = groupData?.name ?? widget.groupName;
+      try {
+        await groupRepo.deleteGroupWithExpenses(groupNameToDelete);
+        if (context.mounted) {
+          Navigator.of(context).pop('deleted');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Group and all expenses deleted successfully'),
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to delete group: $e')));
+        }
+      }
+    }
   }
 
   Future<void> _triggerModal(String? maybeGroupName) async {
@@ -190,6 +254,22 @@ class _ViewGroupDialogState extends State<ViewGroupDialog> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () => _editGroup(context),
+                                  tooltip: 'Edit group',
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () => _deleteGroup(context),
+                                  tooltip: 'Delete group',
                                 ),
                                 IconButton(
                                   icon: const Icon(
