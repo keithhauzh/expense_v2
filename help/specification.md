@@ -17,8 +17,10 @@ TODO: dialog for confirmation on sign out.
 TODO: delete unused pages. 
 TODO: make it so in group view, users cannot scroll past the current month, meaning they cannot view future month expenses
 TODO: convert collections to sub collections inside of a single collection (expense_v2/subcollection)
+TODO: show which account is signed in, also add a mini profile page that shows  
 TODO: change rules on firebase to be read and write only for authenticated users
-TODO: add a totalExpense field to efficiently display totalExpenses for each group (group_item.dart)
+TODO: add a totalExpense field to efficiently display totalExpenses for each group 
+TODO: montly view in dashboard
 
 ## Important Concepts to Remember for This Project
 

@@ -58,6 +58,7 @@ class ViewExpenseDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
+
             // Paid By
             _buildDetailRow(
               context,
@@ -66,9 +67,70 @@ class ViewExpenseDialog extends StatelessWidget {
               Icons.person,
             ),
             const SizedBox(height: 16),
+
+            // Group
+            if (expense.groupName?.isNotEmpty ?? false)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Group',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 8.0,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          _getGroupColor(expense.groupName!),
+                          _getGroupColor(expense.groupName!)
+                              .withOpacity(0.7),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getGroupColor(expense.groupName!)
+                              .withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.groups,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          expense.groupName!,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+              
             // Category
-            if (expense.categoryName != null &&
-                expense.categoryName!.isNotEmpty)
+            if (expense.categoryName?.isNotEmpty ?? false)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -127,6 +189,7 @@ class ViewExpenseDialog extends StatelessWidget {
                   const SizedBox(height: 16),
                 ],
               ),
+
             // Description
             if (expense.description != null &&
                 expense.description!.isNotEmpty)
@@ -230,6 +293,22 @@ class ViewExpenseDialog extends StatelessWidget {
       Color(0xFFFFB74D),
     ];
     final hash = category.hashCode;
+    return colors[hash.abs() % colors.length];
+  }
+
+  // Generate consistent color for group badge based on group name (with hashcode)
+  Color _getGroupColor(String groupName) {
+    const colors = [
+      Color(0xFF6366F1),
+      Color(0xFF3B82F6),
+      Color(0xFF1D4ED8),
+      Color(0xFF7C3AED),
+      Color(0xFFDB2777),
+      Color(0xFFEA580C),
+      Color(0xFFD97706),
+      Color(0xFF059669),
+    ];
+    final hash = groupName.hashCode;
     return colors[hash.abs() % colors.length];
   }
 }

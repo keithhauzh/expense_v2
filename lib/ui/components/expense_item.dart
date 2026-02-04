@@ -51,7 +51,6 @@ class ExpenseItem extends StatelessWidget {
                 ],
               ),
 
-
               // Who paid and category
               Row(
                 children: [
@@ -91,13 +90,11 @@ class ExpenseItem extends StatelessWidget {
                 ],
               ),
 
-
               // Description and group badge
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-
                   // Description
                   Expanded(
                     child: Text(
@@ -113,7 +110,6 @@ class ExpenseItem extends StatelessWidget {
                       expense.groupName!.isNotEmpty)
                     const SizedBox(width: 8),
 
-
                   // Group badge (bottom right)
                   if (expense.groupName != null &&
                       expense.groupName!.isNotEmpty)
@@ -126,8 +122,7 @@ class ExpenseItem extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             _getGroupColor(expense.groupName!),
-                            _getGroupColor(expense.groupName!)
-                                .withOpacity(0.7),
+                            _getGroupColor(expense.groupName!).withOpacity(0.7),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -154,15 +149,15 @@ class ExpenseItem extends StatelessWidget {
   }
 
   // Generate consistent color for category badge based on category name
-	//
-	// Essentially, we are generating a hascode for the category name, 
-	// every string has a hashcode that will never change, so this means
-	// that every distinct category name will have the same color
-	// regardless of app reload 
-	// 
-	// Then we use .abs to ensure we convert negative hash codes
-	// to be positive, also giving a number between 0 and the length of
-	// categories, ensuring we never get an index that is out of bounds
+  //
+  // Essentially, we are generating a hascode for the category name,
+  // every string has a hashcode that will never change, so this means
+  // that every distinct category name will have the same color
+  // regardless of app reload
+  //
+  // Then we use .abs to ensure we convert negative hash codes
+  // to be positive, also giving a number between 0 and the length of
+  // categories, ensuring we never get an index that is out of bounds
   Color _getCategoryColor(String category) {
     const colors = [
       Color(0xFFEF5350),
@@ -181,14 +176,14 @@ class ExpenseItem extends StatelessWidget {
   // Generate consistent color for group badge based on group name (with hashcode)
   Color _getGroupColor(String groupName) {
     const colors = [
-      Color(0xFFFF6B6B),
-      Color(0xFF4ECDC4),
-      Color(0xFF45B7D1),
-      Color(0xFFFFA07A),
-      Color(0xFF98D8C8),
-      Color(0xFFF7DC6F),
-      Color(0xFFBB8FCE),
-      Color(0xFF85C1E2),
+      Color(0xFF6366F1),
+      Color(0xFF3B82F6),
+      Color(0xFF1D4ED8),
+      Color(0xFF7C3AED),
+      Color(0xFFDB2777),
+      Color(0xFFEA580C),
+      Color(0xFFD97706),
+      Color(0xFF059669),
     ];
     final hash = groupName.hashCode;
     return colors[hash.abs() % colors.length];
