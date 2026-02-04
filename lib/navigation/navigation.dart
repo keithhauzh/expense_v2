@@ -3,6 +3,7 @@ import 'package:expense_v2/ui/dialog/add_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_existing_expense_to_category_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_expense_dialog.dart';
 import 'package:expense_v2/ui/dialog/add_group_dialog.dart';
+import 'package:expense_v2/ui/dialog/logout_confirmation_dialog.dart';
 import 'package:expense_v2/ui/pages/dashboard.dart';
 import 'package:expense_v2/ui/pages/expenses_screen.dart';
 import 'package:expense_v2/ui/pages/groups_screen.dart';
@@ -55,9 +56,11 @@ class Navigation {
                   title: Text('Dashboard'),
                   actions: [
                     IconButton(
-                      onPressed: () async {
-                        userRepo.signOut();
-                        context.go('/login');
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => LogoutConfirmation(),
+                        );
                       },
                       icon: Icon(Icons.exit_to_app),
                     ),
@@ -167,9 +170,11 @@ class Navigation {
                     title: Text('Expenses'),
                     actions: [
                       IconButton(
-                        onPressed: () async {
-                          userRepo.signOut();
-                          context.go('/login');
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => LogoutConfirmation(),
+                          );
                         },
                         icon: Icon(Icons.exit_to_app),
                       ),

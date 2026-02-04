@@ -48,7 +48,7 @@ class UserRepoFireImpl {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> logout() async {
     try {
       await FirebaseAuth.instance.signOut();
     } on FirebaseAuthException catch (e) {

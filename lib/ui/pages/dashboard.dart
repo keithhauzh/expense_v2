@@ -4,6 +4,7 @@ import 'package:expense_v2/data/repo/category_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/expense_repo_fire_impl.dart';
 import 'package:expense_v2/data/repo/user_repo_fire_impl.dart';
 import 'package:expense_v2/ui/components/pie_chart_component.dart';
+import 'package:expense_v2/ui/components/monthly_trend_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -18,8 +19,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final userRepo = UserRepoFireImpl();
   final categoryRepo = CategoryRepoFireImpl();
   final expensesRepo = ExpenseRepoFireImpl();
-  Stream<List<Category>> categories = Stream.value([]);
-  Stream<List<Expense>> expenses = Stream.value([]);
+  Stream<List<Category>>? categories;
+  Stream<List<Expense>>? expenses;
   String? username;
   bool _loading = true;
 
@@ -48,22 +49,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         debugPrint("Please sign in first.");
         return;
       }
+      
+      final categoriesFromRepo = categoryRepo.getAllCategories();
+      final expensesFromRepo = expensesRepo.getAllExpensesForCurrentUser(
+        username!,
+      );
+      
       // We set _loading to be false if username
-      // is not null
-      if (mounted) setState(() => _loading = false);
+      // is not null and set the streams
+      if (mounted) {
+        setState(() {
+          categories = categoriesFromRepo;
+          expenses = expensesFromRepo;
+          _loading = false;
+        });
+      }
     } catch (e) {
       if (mounted) {
         context.go('/login');
       }
     }
-    final categoriesFromRepo = categoryRepo.getAllCategories();
-    final expensesFromRepo = expensesRepo.getAllExpensesForCurrentUser(
-      username!,
-    );
-    setState(() {
-      categories = categoriesFromRepo;
-      expenses = expensesFromRepo;
-    });
   }
 
   @override
@@ -74,18 +79,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading || categories == null || expenses == null) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
           child: StreamBuilder<List<Category>>(
-            stream: categories,
+            stream: categories!,
             builder: (context, AsyncSnapshot<List<Category>> categorySnapshot) {
               return StreamBuilder<List<Expense>>(
-                stream: expenses,
+                stream: expenses!,
                 builder: (context, AsyncSnapshot<List<Expense>> expenseSnapshot) {
                   if (!expenseSnapshot.hasData ||
-                      !categorySnapshot.hasData ||
-                      _loading) {
+                      !categorySnapshot.hasData) {
                     return SizedBox(
                       height: 200,
                       child: Center(child: CircularProgressIndicator()),
@@ -134,10 +144,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       .where((category) => category.value > 0)
                       .toList();
 
-                  // Pie chart component (lib/ui/components/pie_chart_component.dart)
-                  return PieChartComponent(
-                    nonZeroExpenses: nonZeroExpenses,
-                    totalExpensePerCategory: totalExpensePerCategory,
+                  // Calculate monthly totals for trend chart
+                  final monthlyTotals = _aggregateMonthlyExpenses(expenseList);
+
+                  // Return both charts in a column
+                  return Column(
+                    children: [
+                      PieChartComponent(
+                        nonZeroExpenses: nonZeroExpenses,
+                        totalExpensePerCategory: totalExpensePerCategory,
+                      ),
+                      MonthlyTrendChart(monthlyTotals: monthlyTotals),
+                    ],
                   );
                 },
               );
@@ -146,5 +164,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ],
     );
+  }
+
+  Map<DateTime, double> _aggregateMonthlyExpenses(List<Expense> expenses) {
+    final now = DateTime.now();
+    final currentMonth = DateTime(now.year, now.month, 1);
+    
+    // Generate last 6 months including current
+    final last6Months = List.generate(6, (index) {
+      return DateTime(currentMonth.year, currentMonth.month - index, 1);
+    }).reversed.toList();
+
+    // Initialize all months with 0
+    final Map<DateTime, double> monthlyTotals = {
+      for (var month in last6Months) month: 0.0
+    };
+
+    // Aggregate expenses by month
+    for (var expense in expenses) {
+      final expenseDate = expense.effectiveCreatedAt;
+      final monthKey = DateTime(expenseDate.year, expenseDate.month, 1);
+      
+      // Only include expenses from the last 6 months
+      if (monthlyTotals.containsKey(monthKey)) {
+        monthlyTotals[monthKey] = (monthlyTotals[monthKey] ?? 0.0) + expense.amount;
+      }
+    }
+
+    return monthlyTotals;
   }
 }
