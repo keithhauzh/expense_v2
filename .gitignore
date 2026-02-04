@@ -1,4 +1,4 @@
-# Miscellaneous
+#Miscellaneous
 *.class
 *.log
 *.pyc
@@ -12,6 +12,11 @@
 .swiftpm/
 .projectile
 migrate_working_dir/
+
+# Firebase  
+firebase_options.dart
+firebase.json
+google-services.json
 
 # IntelliJ related
 *.iml
